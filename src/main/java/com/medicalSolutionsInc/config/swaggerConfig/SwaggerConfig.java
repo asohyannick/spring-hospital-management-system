@@ -1,5 +1,4 @@
 package com.medicalSolutionsInc.config.swaggerConfig;
-
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Contact;
 import io.swagger.v3.oas.models.info.Info;
@@ -13,10 +12,10 @@ public class SwaggerConfig {
     public OpenAPI customOpenAPI() {
         return new OpenAPI()
                 .info(new Info()
-                        .title("💖 Spring HealthCare Management System API 💖")
+                        .title("Hospital Management System Made with 💖 By Asoh Yannick, Java Backend Developer")
                         .version("v1.0.0")
                         .description("""
-                                Welcome to the ❤️ Spring HealthCare Management System API ❤️
+                                Welcome to the NewLife Hospital Management System API
 
                                 This backend powers:
                                 • User & role management  
@@ -25,15 +24,15 @@ public class SwaggerConfig {
                                 • Billing & payments  
                                 • Medical inventory management  
 
-                                Built with Java, Spring Boot, Spring Security, JWT, Hibernate, and MySQL
-                                by Backend Java Developer **Asoh Yannick**.
+                                Built with Java, Spring Boot, Spring Security, JWT, Hibernate, and MongoDB
+                                by Java Backend Developer **Asoh Yannick**.
 
                                 Use this documentation to explore, test, and integrate all endpoints confidently
                                 into your healthcare solutions.
                                 """)
                         .contact(new Contact()
-                                .name("Asoh Yannick ❤️")
-                                .email("asohyannick3@gmail.com")
+                                .name("Asoh Yannick, JavaBoy")
+                                .email("keepcoding200@gmail.com")
                                 .url("https://www.linkedin.com/in/asohyannick/"))
                         .license(new License()
                                 .name("MIT License ❤️")

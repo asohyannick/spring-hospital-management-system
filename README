@@ -1,6 +1,6 @@
 🏥 HealthCare Management System RESTful API
 
-Welcome to the HealthCare Management System RESTful API — a secure and scalable backend built using Java, Spring Boot, and MySQL.
+Welcome to the HealthCare Management System RESTful API — a secure and scalable backend built using Java, Spring Boot,Docker, Redis, Stripe, JWT or Json web Token, OAuth2, Firebase, Spring Security, and MongoDB.
 This API provides a complete backend solution for managing hospitals, pharmacies, patients, payments, telemedicine, and more.
 
 👨‍💻 Developer Profile
@@ -12,7 +12,7 @@ This API provides a complete backend solution for managing hospitals, pharmacies
 
 Java • Spring Boot • Spring Data JPA • Spring Security
 
-MySQL • Stripe • PayPal • RESTful API Architecture
+MongoDB • Stripe • PayPal • RESTful API Architecture
 
 Docker • Microservices • CI/CD
 

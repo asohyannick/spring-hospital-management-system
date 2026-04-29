@@ -1,6 +1,8 @@
 package com.medicalSolutionsInc.dto.userDTO;
 import com.medicalSolutionsInc.enumerations.user.UserRole;
-import java.time.LocalDateTime;
+
+import java.time.Instant;
+
 public record UserResponseDTO(
         Long id,
         String firstName,
@@ -11,7 +13,7 @@ public record UserResponseDTO(
         boolean accountBlocked,
         String accessToken,
         String refreshToken,
-        LocalDateTime createdAt,
-        LocalDateTime updatedAt
+        Instant createdAt,
+        Instant updatedAt
 ) {
 }

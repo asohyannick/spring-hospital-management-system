@@ -3,9 +3,15 @@ spring:
     resources:
       add-mappings: false
 
+  jackson:
+    default-property-inclusion: non_null
+
   application:
     name: ${APP_NAME}
-    app-version: ${API_VERSION}
+
+  threads:
+    virtual:
+      enabled: true
 
   mail:
     host: ${MAIL_HOST}
@@ -19,36 +25,23 @@ spring:
           starttls:
             enable: true
 
-  datasource:
-    url: jdbc:mysql://${DATABASE_HOST}:${DATABASE_PORT}/${DATABASE_NAME}?allowPublicKeyRetrieval=true&useSSL=false
-    username: ${DATABASE_USER}
-    password: ${DATABASE_PASSWORD}
-    driver-class-name: com.mysql.cj.jdbc.Driver
-
-  jpa:
-    hibernate:
-      ddl-auto: ${SPRING_JPA_HIBERNATE_DDL_AUTO}
-    show-sql: ${SPRING_JPA_SHOW_SQL}
-    properties:
-      hibernate:
-        format_sql: true
-    open-in-view: false
+  data:
+    mongodb:
+      uri: ${MONGODB_URI}
+      database: ${MONGODB_DATABASE}
 
 server:
   port: ${APPLICATION_PORT}
 
-# JWT Configuration
 jwt:
   secret-key: ${JWT_SECRET_KEY}
   access-token-expiration: ${ACCESS_TOKEN_EXPIRATION}
   refresh-token-expiration: ${REFRESH_TOKEN_EXPIRATION}
   refresh-access-token: ${REFRESH_ACCESS_TOKEN}
 
-# Stripe Configuration
 stripe:
   api-key: ${STRIPE_API_KEY}
 
-# Firebase Configuration
 firebase:
   project-id: ${FIREBASE_PROJECT_ID}
   private-key-id: ${FIREBASE_PRIVATE_KEY_ID}
@@ -64,3 +57,310 @@ logging:
     org.springframework.mail: INFO
     jakarta.mail: WARN
 
+google:
+  api:
+    key: ${GOOGLE_GEMINI_API_KEY}
+
+api:
+  version: ${API_VERSION}
+
+cors:
+  allowed-origins: ${FRONTEND_DOMAINS}
+  allowed-methods: ${ALLOWED_METHODS}
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    enabled: true
+  show-actuator: false
+
+github:
+  client-id: ${GITHUB_CLIENT_ID}
+  client-secret: ${GITHUB_CLIENT_SECRET}
+  redirect-uri: ${GITHUB_REDIRECT_URL}
+
+mail:
+  from-name: ${MAIL_FROM_NAME}
+
+mailtrap:
+  from-email: ${MAILTRAP_FROM_EMAIL}
+
+app:
+  frontend-url: ${FRONTEND_URL}
+
+seed:
+  # Top-Level Administration
+  super-admin:
+    email: ${SEED_SUPER_ADMIN_EMAIL}
+    password: ${SEED_SUPER_ADMIN_PASSWORD}
+  admin:
+    email: ${SEED_ADMIN_EMAIL}
+    password: ${SEED_ADMIN_PASSWORD}
+  hospital-director:
+    email: ${SEED_HOSPITAL_DIRECTOR_EMAIL}
+    password: ${SEED_HOSPITAL_DIRECTOR_PASSWORD}
+  medical-director:
+    email: ${SEED_MEDICAL_DIRECTOR_EMAIL}
+    password: ${SEED_MEDICAL_DIRECTOR_PASSWORD}
+  chief-medical-officer:
+    email: ${SEED_CHIEF_MEDICAL_OFFICER_EMAIL}
+    password: ${SEED_CHIEF_MEDICAL_OFFICER_PASSWORD}
+  chief-nursing-officer:
+    email: ${SEED_CHIEF_NURSING_OFFICER_EMAIL}
+    password: ${SEED_CHIEF_NURSING_OFFICER_PASSWORD}
+  chief-operations-officer:
+    email: ${SEED_CHIEF_OPERATIONS_OFFICER_EMAIL}
+    password: ${SEED_CHIEF_OPERATIONS_OFFICER_PASSWORD}
+  chief-financial-officer:
+    email: ${SEED_CHIEF_FINANCIAL_OFFICER_EMAIL}
+    password: ${SEED_CHIEF_FINANCIAL_OFFICER_PASSWORD}
+  chief-technology-officer:
+    email: ${SEED_CHIEF_TECHNOLOGY_OFFICER_EMAIL}
+    password: ${SEED_CHIEF_TECHNOLOGY_OFFICER_PASSWORD}
+  chief-compliance-officer:
+    email: ${SEED_CHIEF_COMPLIANCE_OFFICER_EMAIL}
+    password: ${SEED_CHIEF_COMPLIANCE_OFFICER_PASSWORD}
+
+  # Medical Staff
+  doctor:
+    email: ${SEED_DOCTOR_EMAIL}
+    password: ${SEED_DOCTOR_PASSWORD}
+  surgeon:
+    email: ${SEED_SURGEON_EMAIL}
+    password: ${SEED_SURGEON_PASSWORD}
+  radiologist:
+    email: ${SEED_RADIOLOGIST_EMAIL}
+    password: ${SEED_RADIOLOGIST_PASSWORD}
+  anesthesiologist:
+    email: ${SEED_ANESTHESIOLOGIST_EMAIL}
+    password: ${SEED_ANESTHESIOLOGIST_PASSWORD}
+  dentist:
+    email: ${SEED_DENTIST_EMAIL}
+    password: ${SEED_DENTIST_PASSWORD}
+  pediatrician:
+    email: ${SEED_PEDIATRICIAN_EMAIL}
+    password: ${SEED_PEDIATRICIAN_PASSWORD}
+  cardiologist:
+    email: ${SEED_CARDIOLOGIST_EMAIL}
+    password: ${SEED_CARDIOLOGIST_PASSWORD}
+  neurologist:
+    email: ${SEED_NEUROLOGIST_EMAIL}
+    password: ${SEED_NEUROLOGIST_PASSWORD}
+  psychiatrist:
+    email: ${SEED_PSYCHIATRIST_EMAIL}
+    password: ${SEED_PSYCHIATRIST_PASSWORD}
+  pathologist:
+    email: ${SEED_PATHOLOGIST_EMAIL}
+    password: ${SEED_PATHOLOGIST_PASSWORD}
+  general-practitioner:
+    email: ${SEED_GENERAL_PRACTITIONER_EMAIL}
+    password: ${SEED_GENERAL_PRACTITIONER_PASSWORD}
+  consultant:
+    email: ${SEED_CONSULTANT_EMAIL}
+    password: ${SEED_CONSULTANT_PASSWORD}
+
+  # Nursing & Support
+  nurse:
+    email: ${SEED_NURSE_EMAIL}
+    password: ${SEED_NURSE_PASSWORD}
+  head-nurse:
+    email: ${SEED_HEAD_NURSE_EMAIL}
+    password: ${SEED_HEAD_NURSE_PASSWORD}
+  nurse-practitioner:
+    email: ${SEED_NURSE_PRACTITIONER_EMAIL}
+    password: ${SEED_NURSE_PRACTITIONER_PASSWORD}
+  midwife:
+    email: ${SEED_MIDWIFE_EMAIL}
+    password: ${SEED_MIDWIFE_PASSWORD}
+  medical-assistant:
+    email: ${SEED_MEDICAL_ASSISTANT_EMAIL}
+    password: ${SEED_MEDICAL_ASSISTANT_PASSWORD}
+  emergency-responder:
+    email: ${SEED_EMERGENCY_RESPONDER_EMAIL}
+    password: ${SEED_EMERGENCY_RESPONDER_PASSWORD}
+  paramedic:
+    email: ${SEED_PARAMEDIC_EMAIL}
+    password: ${SEED_PARAMEDIC_PASSWORD}
+  therapist:
+    email: ${SEED_THERAPIST_EMAIL}
+    password: ${SEED_THERAPIST_PASSWORD}
+  physiotherapist:
+    email: ${SEED_PHYSIOTHERAPIST_EMAIL}
+    password: ${SEED_PHYSIOTHERAPIST_PASSWORD}
+  occupational-therapist:
+    email: ${SEED_OCCUPATIONAL_THERAPIST_EMAIL}
+    password: ${SEED_OCCUPATIONAL_THERAPIST_PASSWORD}
+  respiratory-therapist:
+    email: ${SEED_RESPIRATORY_THERAPIST_EMAIL}
+    password: ${SEED_RESPIRATORY_THERAPIST_PASSWORD}
+
+  # Diagnostics & Lab
+  lab-technician:
+    email: ${SEED_LAB_TECHNICIAN_EMAIL}
+    password: ${SEED_LAB_TECHNICIAN_PASSWORD}
+  lab-manager:
+    email: ${SEED_LAB_MANAGER_EMAIL}
+    password: ${SEED_LAB_MANAGER_PASSWORD}
+  radiology-technician:
+    email: ${SEED_RADIOLOGY_TECHNICIAN_EMAIL}
+    password: ${SEED_RADIOLOGY_TECHNICIAN_PASSWORD}
+  ultrasound-technician:
+    email: ${SEED_ULTRASOUND_TECHNICIAN_EMAIL}
+    password: ${SEED_ULTRASOUND_TECHNICIAN_PASSWORD}
+  mri-technician:
+    email: ${SEED_MRI_TECHNICIAN_EMAIL}
+    password: ${SEED_MRI_TECHNICIAN_PASSWORD}
+  ct-scan-technician:
+    email: ${SEED_CT_SCAN_TECHNICIAN_EMAIL}
+    password: ${SEED_CT_SCAN_TECHNICIAN_PASSWORD}
+
+  # Pharmacy
+  pharmacist:
+    email: ${SEED_PHARMACIST_EMAIL}
+    password: ${SEED_PHARMACIST_PASSWORD}
+  pharmacy-technician:
+    email: ${SEED_PHARMACY_TECHNICIAN_EMAIL}
+    password: ${SEED_PHARMACY_TECHNICIAN_PASSWORD}
+  pharmacy-manager:
+    email: ${SEED_PHARMACY_MANAGER_EMAIL}
+    password: ${SEED_PHARMACY_MANAGER_PASSWORD}
+
+  # Front Desk & Patient Services
+  receptionist:
+    email: ${SEED_RECEPTIONIST_EMAIL}
+    password: ${SEED_RECEPTIONIST_PASSWORD}
+  patient-coordinator:
+    email: ${SEED_PATIENT_COORDINATOR_EMAIL}
+    password: ${SEED_PATIENT_COORDINATOR_PASSWORD}
+  front-desk-manager:
+    email: ${SEED_FRONT_DESK_MANAGER_EMAIL}
+    password: ${SEED_FRONT_DESK_MANAGER_PASSWORD}
+  customer-service-officer:
+    email: ${SEED_CUSTOMER_SERVICE_OFFICER_EMAIL}
+    password: ${SEED_CUSTOMER_SERVICE_OFFICER_PASSWORD}
+
+  # Billing & Finance
+  billing-specialist:
+    email: ${SEED_BILLING_SPECIALIST_EMAIL}
+    password: ${SEED_BILLING_SPECIALIST_PASSWORD}
+  cashier:
+    email: ${SEED_CASHIER_EMAIL}
+    password: ${SEED_CASHIER_PASSWORD}
+  accountant:
+    email: ${SEED_ACCOUNTANT_EMAIL}
+    password: ${SEED_ACCOUNTANT_PASSWORD}
+  finance-manager:
+    email: ${SEED_FINANCE_MANAGER_EMAIL}
+    password: ${SEED_FINANCE_MANAGER_PASSWORD}
+  insurance-coordinator:
+    email: ${SEED_INSURANCE_COORDINATOR_EMAIL}
+    password: ${SEED_INSURANCE_COORDINATOR_PASSWORD}
+  claims-officer:
+    email: ${SEED_CLAIMS_OFFICER_EMAIL}
+    password: ${SEED_CLAIMS_OFFICER_PASSWORD}
+
+  # IT & Engineering
+  it-support:
+    email: ${SEED_IT_SUPPORT_EMAIL}
+    password: ${SEED_IT_SUPPORT_PASSWORD}
+  it-manager:
+    email: ${SEED_IT_MANAGER_EMAIL}
+    password: ${SEED_IT_MANAGER_PASSWORD}
+  software-developer:
+    email: ${SEED_SOFTWARE_DEVELOPER_EMAIL}
+    password: ${SEED_SOFTWARE_DEVELOPER_PASSWORD}
+  devops-engineer:
+    email: ${SEED_DEVOPS_ENGINEER_EMAIL}
+    password: ${SEED_DEVOPS_ENGINEER_PASSWORD}
+  data-scientist:
+    email: ${SEED_DATA_SCIENTIST_EMAIL}
+    password: ${SEED_DATA_SCIENTIST_PASSWORD}
+  data-analyst:
+    email: ${SEED_DATA_ANALYST_EMAIL}
+    password: ${SEED_DATA_ANALYST_PASSWORD}
+  system-administrator:
+    email: ${SEED_SYSTEM_ADMINISTRATOR_EMAIL}
+    password: ${SEED_SYSTEM_ADMINISTRATOR_PASSWORD}
+  network-engineer:
+    email: ${SEED_NETWORK_ENGINEER_EMAIL}
+    password: ${SEED_NETWORK_ENGINEER_PASSWORD}
+  cybersecurity-analyst:
+    email: ${SEED_CYBERSECURITY_ANALYST_EMAIL}
+    password: ${SEED_CYBERSECURITY_ANALYST_PASSWORD}
+  quality-assurance:
+    email: ${SEED_QUALITY_ASSURANCE_EMAIL}
+    password: ${SEED_QUALITY_ASSURANCE_PASSWORD}
+
+  # HR & Compliance
+  hr-manager:
+    email: ${SEED_HR_MANAGER_EMAIL}
+    password: ${SEED_HR_MANAGER_PASSWORD}
+  hr-assistant:
+    email: ${SEED_HR_ASSISTANT_EMAIL}
+    password: ${SEED_HR_ASSISTANT_PASSWORD}
+  compliance-officer:
+    email: ${SEED_COMPLIANCE_OFFICER_EMAIL}
+    password: ${SEED_COMPLIANCE_OFFICER_PASSWORD}
+  training-coordinator:
+    email: ${SEED_TRAINING_COORDINATOR_EMAIL}
+    password: ${SEED_TRAINING_COORDINATOR_PASSWORD}
+
+  # Operations & Facility Management
+  operations-manager:
+    email: ${SEED_OPERATIONS_MANAGER_EMAIL}
+    password: ${SEED_OPERATIONS_MANAGER_PASSWORD}
+  facility-manager:
+    email: ${SEED_FACILITY_MANAGER_EMAIL}
+    password: ${SEED_FACILITY_MANAGER_PASSWORD}
+  maintenance-technician:
+    email: ${SEED_MAINTENANCE_TECHNICIAN_EMAIL}
+    password: ${SEED_MAINTENANCE_TECHNICIAN_PASSWORD}
+  cleaning-staff:
+    email: ${SEED_CLEANING_STAFF_EMAIL}
+    password: ${SEED_CLEANING_STAFF_PASSWORD}
+  security-officer:
+    email: ${SEED_SECURITY_OFFICER_EMAIL}
+    password: ${SEED_SECURITY_OFFICER_PASSWORD}
+  transport-driver:
+    email: ${SEED_TRANSPORT_DRIVER_EMAIL}
+    password: ${SEED_TRANSPORT_DRIVER_PASSWORD}
+
+  # Warehouse & Procurement
+  procurement-officer:
+    email: ${SEED_PROCUREMENT_OFFICER_EMAIL}
+    password: ${SEED_PROCUREMENT_OFFICER_PASSWORD}
+  supply-chain-manager:
+    email: ${SEED_SUPPLY_CHAIN_MANAGER_EMAIL}
+    password: ${SEED_SUPPLY_CHAIN_MANAGER_PASSWORD}
+  inventory-manager:
+    email: ${SEED_INVENTORY_MANAGER_EMAIL}
+    password: ${SEED_INVENTORY_MANAGER_PASSWORD}
+  store-keeper:
+    email: ${SEED_STORE_KEEPER_EMAIL}
+    password: ${SEED_STORE_KEEPER_PASSWORD}
+
+  # External & Community
+  social-worker:
+    email: ${SEED_SOCIAL_WORKER_EMAIL}
+    password: ${SEED_SOCIAL_WORKER_PASSWORD}
+  volunteer:
+    email: ${SEED_VOLUNTEER_EMAIL}
+    password: ${SEED_VOLUNTEER_PASSWORD}
+  community-health-worker:
+    email: ${SEED_COMMUNITY_HEALTH_WORKER_EMAIL}
+    password: ${SEED_COMMUNITY_HEALTH_WORKER_PASSWORD}
+  public-health-officer:
+    email: ${SEED_PUBLIC_HEALTH_OFFICER_EMAIL}
+    password: ${SEED_PUBLIC_HEALTH_OFFICER_PASSWORD}
+
+  # Patient
+  patient:
+    email: ${SEED_PATIENT_EMAIL}
+    password: ${SEED_PATIENT_PASSWORD}
+
+cloudinary:
+  cloud-name: ${CLOUDINARY_CLOUD_NAME}
+  api-key: ${CLOUDINARY_API_KEY}
+  api-secret: ${CLOUDINARY_API_SECRET}
