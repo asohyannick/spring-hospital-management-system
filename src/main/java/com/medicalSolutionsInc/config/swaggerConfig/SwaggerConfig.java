@@ -24,7 +24,7 @@ public class SwaggerConfig {
                                 • Billing & payments  
                                 • Medical inventory management  
 
-                                Built with Java, Spring Boot, Spring Security, JWT, Hibernate, and MongoDB
+                                Built with Java, Spring Boot, Spring Security, JWT, Hibernate, Stripe, and MongoDB
                                 by Java Backend Developer **Asoh Yannick**.
 
                                 Use this documentation to explore, test, and integrate all endpoints confidently
@@ -39,19 +39,7 @@ public class SwaggerConfig {
                                 .url("https://opensource.org/licenses/MIT")))
                 .addTagsItem(new Tag()
                         .name("Authentication & User Management Endpoints")
-                        .description("APIs for managing users, roles, and authentication"))
-                .addTagsItem(new Tag()
-                        .name("Patient Records")
-                        .description("APIs for managing patient profiles and medical records"))
-                .addTagsItem(new Tag()
-                        .name("Appointments")
-                        .description("APIs for scheduling and managing appointments"))
-                .addTagsItem(new Tag()
-                        .name("Billing")
-                        .description("APIs for handling invoices, billing, and payments"))
-                .addTagsItem(new Tag()
-                        .name("Inventory")
-                        .description("APIs for managing medical inventory and supplies"));
+                        .description("APIs for managing users, roles, and authentication"));
     }
 }
 

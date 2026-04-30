@@ -1,4 +1,4 @@
-package com.medicalSolutionsInc.controller.user;
+package com.medicalSolutionsInc.controller.userController;
 
 import com.medicalSolutionsInc.config.ApiResponseConfig.ApiResponseConfig;
 import com.medicalSolutionsInc.dto.userDTO.*;
@@ -11,15 +11,13 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseCookie;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 @RestController
 @Tag(name = "Authentication & User Management Endpoints", description = "APIs for authentication and user management")
@@ -123,14 +121,16 @@ public class UserController {
 	@GetMapping
 	public ResponseEntity<ApiResponseConfig<List<UserResponseDTO>>> fetchAllUsers() {
 		List<UserResponseDTO> users = userService.fetchAllUsers();
-		return ResponseEntity.ok(
-				new ApiResponseConfig<>(
-						Instant.now(),
-						"Users fetched successfully.",
-						users,
-						HttpStatus.OK.value()
-				)
-		);
+		return ResponseEntity
+				       .ok( )
+				       .cacheControl ( CacheControl.maxAge ( 5, TimeUnit.MINUTES ).cachePublic () )
+				       .body (
+						new ApiResponseConfig<>(
+								Instant.now(),
+								"Users fetched successfully.",
+								users,
+								HttpStatus.OK.value()
+						) );
 	}
 	
 	@Operation(summary = "Delete user account", description = "Permanently deletes a user account by ID")

@@ -64,24 +64,24 @@ public class CloudinaryConfig {
 					"secure",     true
 			));
 		}
-		
-		
-		public String uploadProfilePicture(MultipartFile file, UUID entityId) throws  Exception {
+
+
+		public String uploadProfilePicture(MultipartFile file, UUID entityId) throws Exception {
 			validateImage(file, "Profile picture");
+			
 			return upload(
 					file,
 					BASE_FOLDER + "/profile-pictures",
 					"profile_" + entityId,
 					ObjectUtils.asMap(
 							"resource_type", "image",
-							"transformation", List.of (   new Transformation ()
-									                              .width(400)
-									                              .height(400)
-									                              .crop("fill")
-									                              .gravity("face")
-									                              .quality("auto")
-									                              .fetchFormat("auto")
-							)
+							"transformation", new Transformation()
+									                  .width(400)
+									                  .height(400)
+									                  .crop("fill")
+									                  .gravity("face")
+									                  .quality("auto")
+									                  .fetchFormat("auto")
 					)
 			);
 		}

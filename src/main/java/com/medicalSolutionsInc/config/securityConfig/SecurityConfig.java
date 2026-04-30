@@ -3,6 +3,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.medicalSolutionsInc.config.corConfig.CorsConfiguration;
 import com.medicalSolutionsInc.config.firebaseConfig.FirebaseAuthenticationFilter;
 import com.medicalSolutionsInc.config.jwtConfig.JWTAuthenticationFilter;
+import com.medicalSolutionsInc.config.rateLimitFilter.RateLimitFilter;
 import com.medicalSolutionsInc.exceptions.globalExceptionResponseHandler.GlobalExceptionResponseHandler;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -28,6 +29,7 @@ import org.springframework.security.oauth2.client.web.OAuth2AuthorizedClientRepo
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.AccessDeniedHandler;
+import org.springframework.security.web.access.channel.ChannelProcessingFilter;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import java.nio.charset.StandardCharsets;
@@ -41,7 +43,9 @@ public class SecurityConfig {
         private final JWTAuthenticationFilter jwtAuthenticationFilter;
 		private final CorsConfiguration corsConfig;
 		private final ObjectMapper objectMapper;
-		@Value ( "${api.version}" )
+        private final RateLimitFilter rateLimitFilter;
+		
+        @Value ( "${api.version}" )
 		private String apiVersion;
 		
 		@Value("${github.client-id}")
@@ -169,6 +173,7 @@ public class SecurityConfig {
 							                        .clientRegistrationRepository(clientRegistrationRepository())
 							                        .authorizedClientRepository(authorizedClientRepository())
 					)
+					.addFilterBefore(rateLimitFilter, ChannelProcessingFilter.class)
 					.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
 					.authorizeHttpRequests(auth -> auth
 							                               .requestMatchers(HttpMethod.GET, "/v3/api-docs/**", "/swagger-ui/**", "/webjars/**").permitAll()
@@ -179,6 +184,15 @@ public class SecurityConfig {
 							                               .requestMatchers ( HttpMethod.GET , "/api/" + apiVersion + "/users/*" ).hasAnyRole ( "ADMIN" , "SUPER_ADMIN" )
 							                               .requestMatchers ( HttpMethod.PATCH , "/api/" + apiVersion + "/auth/users/*/block" ).hasAnyRole ( "ADMIN" , "SUPER_ADMIN" )
 							                               .requestMatchers ( HttpMethod.PATCH , "/api/" + apiVersion + "/auth/users/*/unblock" ).hasAnyRole ( "ADMIN" , "SUPER_ADMIN")
+							                               
+							                               // ─── Booking Management ────────────────────────────────────────────────
+							                               .requestMatchers(HttpMethod.POST,   "/api/" + apiVersion + "/booking/add-booking").hasAnyRole("ADMIN", "SUPER_ADMIN")
+							                               .requestMatchers(HttpMethod.GET,    "/api/" + apiVersion + "/booking").hasAnyRole("ADMIN", "SUPER_ADMIN")
+							                               .requestMatchers(HttpMethod.GET,    "/api/" + apiVersion + "/booking/count").hasAnyRole("ADMIN", "SUPER_ADMIN")
+							                               .requestMatchers(HttpMethod.GET,    "/api/" + apiVersion + "/booking/search").hasAnyRole("ADMIN", "SUPER_ADMIN")
+							                               .requestMatchers(HttpMethod.GET,    "/api/" + apiVersion + "/booking/*").hasAnyRole("ADMIN", "SUPER_ADMIN")
+							                               .requestMatchers(HttpMethod.PUT,    "/api/" + apiVersion + "/booking/*").hasAnyRole("ADMIN", "SUPER_ADMIN")
+							                               .requestMatchers(HttpMethod.DELETE, "/api/" + apiVersion + "/booking/*").hasRole("SUPER_ADMIN")
 							                               .anyRequest().authenticated ()
 					)
 					.exceptionHandling(exception -> exception
