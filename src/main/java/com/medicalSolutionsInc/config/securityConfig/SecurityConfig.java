@@ -54,12 +54,13 @@ public class SecurityConfig {
 		private String githubRedirectUri;
 		
 		private String[] publicEndpoints ( ) {
-			String base = "/api/" + apiVersion + "/auth";
+			String base = "/api/" + apiVersion + "/users";
 			return new String[] {
 					base + "/auth/register",
 					base + "/auth/login",
 					base + "/auth/logout",
 					base + "/auth/google-login",
+					base + "/auth/github/callback",
 					base + "/auth/github-login",
 					base + "/auth/magic-link/send",
 					base + "/auth/magic-link/verify",
@@ -163,6 +164,7 @@ public class SecurityConfig {
 					.sessionManagement(session -> session
 							                              .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
 					)
+					
 					.oauth2Client(oauth2 -> oauth2
 							                        .clientRegistrationRepository(clientRegistrationRepository())
 							                        .authorizedClientRepository(authorizedClientRepository())
@@ -171,6 +173,12 @@ public class SecurityConfig {
 					.authorizeHttpRequests(auth -> auth
 							                               .requestMatchers(HttpMethod.GET, "/v3/api-docs/**", "/swagger-ui/**", "/webjars/**").permitAll()
 							                               .requestMatchers(publicEndpoints()).permitAll()
+														   
+							                               // ─── Authentication and Authorization Management endpoints ─────────────────────────────────────────────────────
+							                               .requestMatchers ( HttpMethod.GET , "/api/" + apiVersion + "/users" ).hasAnyRole ( "ADMIN" , "SUPER_ADMIN" )
+							                               .requestMatchers ( HttpMethod.GET , "/api/" + apiVersion + "/users/*" ).hasAnyRole ( "ADMIN" , "SUPER_ADMIN" )
+							                               .requestMatchers ( HttpMethod.PATCH , "/api/" + apiVersion + "/auth/users/*/block" ).hasAnyRole ( "ADMIN" , "SUPER_ADMIN" )
+							                               .requestMatchers ( HttpMethod.PATCH , "/api/" + apiVersion + "/auth/users/*/unblock" ).hasAnyRole ( "ADMIN" , "SUPER_ADMIN")
 							                               .anyRequest().authenticated ()
 					)
 					.exceptionHandling(exception -> exception

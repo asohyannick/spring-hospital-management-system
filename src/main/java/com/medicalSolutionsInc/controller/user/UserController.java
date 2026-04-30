@@ -8,12 +8,16 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
 
@@ -77,9 +81,10 @@ public class UserController {
 	})
 	@PostMapping("/auth/login")
 	public ResponseEntity<ApiResponseConfig<UserResponseDTO>> login(
-			@Valid @RequestBody LoginRequestDTO request
+			@Valid @RequestBody LoginRequestDTO request,
+			HttpServletResponse response
 	) throws Exception{
-		UserResponseDTO user = userService.login(request);
+		UserResponseDTO user = userService.login(request, response);
 		return ResponseEntity.ok(
 				new ApiResponseConfig<>(
 						Instant.now(),
@@ -89,19 +94,17 @@ public class UserController {
 				)
 		);
 	}
-	
-	@Operation(summary = "Logout", description = "Invalidates the user's access and refresh tokens")
+
+	@Operation(summary = "Logout", description = "Invalidates the user's session cookies")
 	@ApiResponses({
 			@ApiResponse(responseCode = "200", description = "Logout successful"),
 			@ApiResponse(responseCode = "401", description = "Unauthorized")
 	})
 	@PostMapping("/auth/logout")
 	public ResponseEntity<ApiResponseConfig<Void>> logout(
-			@Parameter(description = "Bearer access token")
-			@RequestHeader("Authorization") String authHeader
+			HttpServletResponse response
 	) throws Exception {
-		String token = authHeader.replace("Bearer ", "");
-		userService.logout(token);
+		userService.logout(response);
 		return ResponseEntity.ok(
 				new ApiResponseConfig<>(
 						Instant.now(),
@@ -220,12 +223,12 @@ public class UserController {
 			@ApiResponse(responseCode = "200", description = "Magic link verified and user logged in"),
 			@ApiResponse(responseCode = "400", description = "Invalid or expired magic link token")
 	})
-	@GetMapping("/auth/magic-link/verify")
+	@PostMapping("/auth/magic-link/verify")
 	public ResponseEntity<ApiResponseConfig<UserResponseDTO>> verifyMagicLink(
 			@Parameter(description = "Magic link token from email")
-			@RequestParam VerifyMagicLinkTokenDTO verifyMagicLinkTokenDTO
+			@RequestParam VerifyMagicLinkTokenDTO token
 	) throws Exception {
-		UserResponseDTO user = userService.verifyMagicLink(verifyMagicLinkTokenDTO);
+		UserResponseDTO user = userService.verifyMagicLink(token);
 		return ResponseEntity.ok(
 				new ApiResponseConfig<>(
 						Instant.now(),
@@ -244,9 +247,9 @@ public class UserController {
 	@PostMapping("/auth/magic-link/resend")
 	public ResponseEntity<ApiResponseConfig<Void>> resendMagicLink(
 			@Parameter(description = "User email address")
-			@Valid @RequestBody MagicLinkTokenRequestDTO magicLinkTokenRequestDTO
+			@Valid @RequestBody MagicLinkTokenRequestDTO token
 	) throws Exception {
-		userService.resendMagicLink(magicLinkTokenRequestDTO);
+		userService.resendMagicLink(token);
 		return ResponseEntity.ok(
 				new ApiResponseConfig<>(
 						Instant.now(),
@@ -309,9 +312,9 @@ public class UserController {
 	@PostMapping("/auth/google-login")
 	public ResponseEntity<ApiResponseConfig<UserResponseDTO>> loginViaFirebase(
 			@Parameter(description = "Firebase ID token")
-			@RequestParam FirebaseLoginRequestDTO firebaseLoginRequestDTO
+			@Valid @RequestBody FirebaseLoginRequestDTO token
 	) throws Exception {
-		UserResponseDTO user = userService.loginViaFirebase(firebaseLoginRequestDTO);
+		UserResponseDTO user = userService.loginViaFirebase(token);
 		return ResponseEntity.ok(
 				new ApiResponseConfig<>(
 						Instant.now(),
@@ -321,24 +324,49 @@ public class UserController {
 				)
 		);
 	}
-	
-	@Operation(summary = "Login via GitHub", description = "Authenticates a user using GitHub OAuth2 and returns tokens")
-	@ApiResponses({
-			@ApiResponse(responseCode = "200", description = "GitHub login successful"),
-			@ApiResponse(responseCode = "401", description = "Invalid GitHub token")
-	})
-	@PostMapping("/auth/github-login")
+
+	@GetMapping("/auth/github/callback")
+	public ResponseEntity<?> githubCallback(
+			@RequestParam String code,
+			HttpServletResponse response
+	) throws Exception {
+		GithubAuthResult result = userService.handleGithubCallback(code);
+		
+		ResponseCookie accessCookie = ResponseCookie.from("accessToken", result.accessToken())
+				                              .httpOnly(true)
+				                              .secure(true)
+				                              .path("/")
+				                              .maxAge( Duration.ofMinutes(15))
+				                              .sameSite("Strict")
+				                              .build();
+		
+		ResponseCookie refreshCookie = ResponseCookie.from("refreshToken", result.refreshToken())
+				                               .httpOnly(true)
+				                               .secure(true)
+				                               .path("/")
+				                               .maxAge(Duration.ofDays(7))
+				                               .sameSite("Strict")
+				                               .build();
+		
+		response.addHeader( HttpHeaders.SET_COOKIE, accessCookie.toString());
+		response.addHeader(HttpHeaders.SET_COOKIE, refreshCookie.toString());
+		
+		response.sendRedirect("http://localhost:3000/success");
+		return null;
+	}
+
+	@GetMapping("/auth/github-login")
 	public ResponseEntity<ApiResponseConfig<UserResponseDTO>> loginViaGithub(
 			@Parameter(description = "GitHub user email") @RequestParam String email,
 			@Parameter(description = "GitHub full name") @RequestParam(required = false) String name,
 			@Parameter(description = "GitHub avatar URL") @RequestParam(required = false) String avatarUrl
 	) throws Exception {
-		UserResponseDTO user = userService.loginViaGithub(email, name, avatarUrl);
+		GithubAuthResult result = userService.loginViaGithub(email, name, avatarUrl);
 		return ResponseEntity.ok(
 				new ApiResponseConfig<>(
 						Instant.now(),
 						"GitHub login successful. Welcome!",
-						user,
+						result.user(),
 						HttpStatus.OK.value()
 				)
 		);

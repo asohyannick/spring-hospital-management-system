@@ -1,6 +1,7 @@
 package com.medicalSolutionsInc.service.user;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseToken;
+import com.medicalSolutionsInc.config.cookieConfig.CookieConfig;
 import com.medicalSolutionsInc.config.emailTemplateConfig.EmailTemplateConfig;
 import com.medicalSolutionsInc.config.jwtConfig.JWTConfiguration;
 import com.medicalSolutionsInc.dto.userDTO.*;
@@ -12,14 +13,19 @@ import com.medicalSolutionsInc.exceptions.notFoundException.NotFoundException;
 import com.medicalSolutionsInc.exceptions.unAuthorizedException.UnAuthorizedException;
 import com.medicalSolutionsInc.mappers.userMapper.auth.UserMapper;
 import com.medicalSolutionsInc.repository.user.UserRepository;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestTemplate;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @Slf4j
@@ -33,8 +39,15 @@ public class UserService {
         private final FirebaseAuth firebaseAuth;
         private final EmailTemplateConfig emailTemplateConfig;
 		private final JWTConfiguration jwtConfiguration;
+		private final CookieConfig cookieConfig;
+
+		@Value ("${github.client-id}")
+		private String githubClientId;
 		
-		public UserResponseDTO registerUser(RegistrationRequestDTO request) throws Exception {
+		@Value("${github.client-secret}")
+		private String githubClientSecret;
+		
+		public UserResponseDTO registerUser( RegistrationRequestDTO request ) throws Exception {
 			if (userRepository.existsByEmail(request.email())) {
 				throw new ConflictRequestException ("An account with this email already exists");
 			}
@@ -56,6 +69,8 @@ public class UserService {
 			
 			User savedUser = userRepository.save(user);
 			
+		
+			
 			emailTemplateConfig.sendAccountCreatedEmail(
 					savedUser.getEmail(),
 					savedUser.getFirstName(),
@@ -67,7 +82,7 @@ public class UserService {
 		}
 		
 		public UserResponseDTO createPassword( String token, CreatePasswordRequestDTO createPasswordRequestDTO) throws  Exception {
-			if (!createPasswordRequestDTO.equals(createPasswordRequestDTO.confirmPassword ())) {
+			if (!createPasswordRequestDTO.password ().equals(createPasswordRequestDTO.confirmPassword ())) {
 				throw new BadRequestException("Passwords do not match");
 			}
 			
@@ -93,7 +108,7 @@ public class UserService {
 			return userMapper.toResponse(userRepository.save(user));
 		}
 		
-		public UserResponseDTO login(LoginRequestDTO request) throws  Exception{
+		public UserResponseDTO login(LoginRequestDTO request, HttpServletResponse response) throws  Exception{
 			User user = findUserByEmail(request.email());
 			
 			if (user.isAccountBlocked()) {
@@ -121,25 +136,19 @@ public class UserService {
 			String accessToken  = jwtConfiguration.generateAccessToken(user.getEmail(), user.getRole().name());
 			String refreshToken = jwtConfiguration.generateRefreshToken(user.getEmail());
 			
-			user.setAccessToken(accessToken);
-			user.setRefreshToken(refreshToken);
+			cookieConfig.setAccessTokenCookie(response, accessToken);
+			cookieConfig.setRefreshTokenCookie(response, refreshToken);
+			
 			user.setUpdatedAt(Instant.now());
 			
 			log.info("User logged in successfully: {}", user.getEmail());
 			return userMapper.toResponse(userRepository.save(user));
 		}
-		
-		
-		public void logout(String token) throws Exception {
-			String email = jwtConfiguration.extractEmail(token);
-			User user = findUserByEmail(email);
-			
-			user.setAccessToken(null);
-			user.setRefreshToken(null);
-			user.setUpdatedAt(Instant.now());
-			
-			userRepository.save(user);
-			log.info("User logged out successfully: {}", email);
+
+
+		public void logout(HttpServletResponse response) throws Exception {
+			cookieConfig.clearTokenCookies(response);
+			log.info("User logged out successfully");
 		}
 		
 		@Transactional(readOnly = true)
@@ -174,7 +183,7 @@ public class UserService {
 		}
 		
 		public void resetPassword( String token, ResetPasswordRequestDTO resetPasswordRequestDTO ) throws Exception {
-			if (!resetPasswordRequestDTO.equals(resetPasswordRequestDTO.confirmPassword ())) {
+			if (!resetPasswordRequestDTO.newPassword ().equals(resetPasswordRequestDTO.confirmPassword ())) {
 				throw new BadRequestException("Passwords do not match");
 			}
 			
@@ -225,7 +234,7 @@ public class UserService {
 			String email = jwtConfiguration.extractEmail(verifyMagicLinkTokenDTO.token ());
 			User user = findUserByEmail(email);
 			
-			if (!verifyMagicLinkTokenDTO.equals(user.getMagicLinkToken())) {
+			if (!verifyMagicLinkTokenDTO.token ().equals(user.getMagicLinkToken())) {
 				throw new BadRequestException("Magic link token mismatch or already used");
 			}
 			
@@ -315,8 +324,8 @@ public class UserService {
 			log.info("User logged in via Firebase: {}", email);
 			return userMapper.toResponse(userRepository.save(user));
 		}
-		
-		public UserResponseDTO loginViaGithub(String githubEmail, String githubName, String avatarUrl) throws Exception {
+
+		public GithubAuthResult loginViaGithub(String githubEmail, String githubName, String avatarUrl) throws Exception {
 			User user = userRepository.findByEmail(githubEmail).orElseGet(() -> {
 				String[] nameParts = githubName != null ? githubName.split(" ", 2) : new String[]{"", ""};
 				User newUser = User.builder()
@@ -337,7 +346,7 @@ public class UserService {
 			});
 			
 			if (user.isAccountBlocked()) {
-				throw new UnAuthorizedException ("Your account has been blocked. Please contact support");
+				throw new UnAuthorizedException("Your account has been blocked. Please contact support");
 			}
 			
 			String accessToken  = jwtConfiguration.generateAccessToken(user.getEmail(), user.getRole().name());
@@ -348,7 +357,79 @@ public class UserService {
 			user.setUpdatedAt(Instant.now());
 			
 			log.info("User logged in via GitHub: {}", githubEmail);
-			return userMapper.toResponse(userRepository.save(user));
+			return new GithubAuthResult(accessToken, refreshToken, userMapper.toResponse(userRepository.save(user)));
+		}
+
+		public GithubAuthResult handleGithubCallback(String code) throws Exception {
+			String accessToken = exchangeCodeForToken(code);
+			Map<String, Object> githubUser = fetchGithubUser(accessToken);
+			
+			String email  = (String) githubUser.get("email");
+			String name   = (String) githubUser.get("name");
+			String avatar = (String) githubUser.get("avatar_url");
+			
+			if (email == null) {
+				email = fetchGithubPrimaryEmail(accessToken);
+			}
+			
+			return loginViaGithub(email, name, avatar);
+		}
+		
+		private String exchangeCodeForToken(String code) {
+			RestTemplate rest = new RestTemplate();
+			
+			HttpHeaders headers = new HttpHeaders();
+			headers.setAccept(List.of(MediaType.APPLICATION_JSON));
+			
+			Map<String, String> body = Map.of(
+					"client_id",     githubClientId,
+					"client_secret", githubClientSecret,
+					"code",          code
+			);
+			
+			ResponseEntity<Map> resp = rest.postForEntity(
+					"https://github.com/login/oauth/access_token",
+					new HttpEntity<>(body, headers),
+					Map.class
+			);
+			
+			return (String) resp.getBody().get("access_token");
+		}
+		
+		private Map<String, Object> fetchGithubUser(String accessToken) {
+			RestTemplate rest = new RestTemplate();
+			
+			HttpHeaders headers = new HttpHeaders();
+			headers.setBearerAuth(accessToken);
+			
+			ResponseEntity<Map> resp = rest.exchange(
+					"https://api.github.com/user",
+					HttpMethod.GET,
+					new HttpEntity<>(headers),
+					Map.class
+			);
+			
+			return resp.getBody();
+		}
+		
+		private String fetchGithubPrimaryEmail(String accessToken) throws  Exception {
+			RestTemplate rest = new RestTemplate();
+			
+			HttpHeaders headers = new HttpHeaders();
+			headers.setBearerAuth(accessToken);
+			
+			ResponseEntity<List> resp = rest.exchange(
+					"https://api.github.com/user/emails",
+					HttpMethod.GET,
+					new HttpEntity<>(headers),
+					List.class
+			);
+			
+			return ((List<Map<String, Object>>) resp.getBody()).stream()
+					       .filter(e -> Boolean.TRUE.equals(e.get("primary")))
+					       .map(e -> (String) e.get("email"))
+					       .findFirst()
+					       .orElseThrow(() -> new NotFoundException ("No primary email found"));
 		}
 		
 		private User findUserByEmail(String email) throws Exception {

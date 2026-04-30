@@ -31,7 +31,7 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
 		private final JWTConfiguration jwtConfig;
 		
 		private static final String BEARER_PREFIX       = "Bearer ";
-		private static final String ACCESS_TOKEN_COOKIE = "accessToken";
+		private static final String ACCESS_TOKEN_COOKIE = "access_token";
 		
 		
 		@Override
@@ -86,7 +86,24 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
 			
 			return null;
 		}
-		
+
+		private String resolveTokens(HttpServletRequest request) {
+			// ✅ Temporary debug - remove after fixing
+			if (request.getCookies() != null) {
+				log.info("=== COOKIES RECEIVED ===");
+				Arrays.stream(request.getCookies())
+						.forEach(c -> log.info("Cookie: name='{}' value='{}'", c.getName(), c.getValue()));
+			} else {
+				log.info("=== NO COOKIES RECEIVED ===");
+			}
+			
+			if (request.getCookies() == null) return null;
+			return Arrays.stream(request.getCookies())
+					       .filter(c -> ACCESS_TOKEN_COOKIE.equals(c.getName()))
+					       .map(Cookie::getValue)
+					       .findFirst()
+					       .orElse(null);
+		}
 		private void processAuthentication(String token, HttpServletRequest request) {
 			Claims claims  = jwtConfig.validateToken(token);
 			String email   = claims.getSubject();

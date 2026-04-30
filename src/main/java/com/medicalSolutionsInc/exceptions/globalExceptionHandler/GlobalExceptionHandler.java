@@ -208,17 +208,33 @@ public class GlobalExceptionHandler {
 					request
 			);
 		}
+
+
+		@ExceptionHandler(com.medicalSolutionsInc.exceptions.badRequestException.BadRequestException.class)
+		public ResponseEntity<GlobalExceptionResponseHandler> handleBadRequestException(
+				com.medicalSolutionsInc.exceptions.badRequestException.BadRequestException ex,
+				HttpServletRequest request) {
+			
+			return buildResponse(
+					ex.getMessage(),
+					"Bad request",
+					HttpStatus.BAD_REQUEST.getReasonPhrase(),
+					HttpStatus.BAD_REQUEST,
+					request
+			);
+		}
+
 		
 		@ExceptionHandler(Exception.class)
-		public ResponseEntity< Map <String, Object> > handleRuntimeException(
-				RuntimeException ex, HttpServletRequest request) {
+		public ResponseEntity<Map<String, Object>> handleRuntimeException(
+				Exception ex, HttpServletRequest request) {
 			
-			int status = ex.getMessage().contains("quota") ? 503 : 500;
+			int status = ex.getMessage() != null && ex.getMessage().contains("quota") ? 503 : 500;
 			
 			return ResponseEntity.status(status).body(Map.of(
 					"status",    status,
 					"error",     status == 503 ? "Service Unavailable" : "Internal Server Error",
-					"message",   ex.getMessage(),
+					"message",   ex.getMessage() != null ? ex.getMessage() : "Unexpected error",
 					"path",      request.getRequestURI(),
 					"timestamp", Instant.now()
 			));
