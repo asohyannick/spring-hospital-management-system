@@ -21,7 +21,7 @@ import java.util.UUID;
 public class Booking {
 
 		@Id
-		private UUID id;
+		private String id;
 		private String imageURL;
 		private String firstName;
 		private String lastName;

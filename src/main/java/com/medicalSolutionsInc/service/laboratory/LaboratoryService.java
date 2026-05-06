@@ -111,17 +111,14 @@ private final CloudinaryConfig cloudinaryConfig;
 			laboratoryRepository.save(laboratory);
 			log.info("Laboratory soft-deleted successfully: {}", id);
 		}
-		
-		
+
+
 		public Page<LaboratoryResponseDTO> searchLaboratories(String keyword, Pageable pageable) {
 			log.info("Searching laboratories with keyword: '{}'", keyword);
 			return laboratoryRepository
-					       .findByDeletedAtIsNullAndNameContainingIgnoreCaseOrDeletedAtIsNullAndEmailContainingIgnoreCaseOrDeletedAtIsNullAndRegistrationNumberContainingIgnoreCase(
-							       keyword, keyword, keyword, pageable
-					       )
+					       .searchByKeyword(keyword, pageable)
 					       .map(laboratoryMapper::toResponseDTO);
 		}
-		
 		public long countLaboratories() {
 			log.info("Counting all active laboratories");
 			return laboratoryRepository.countByDeletedAtIsNull();

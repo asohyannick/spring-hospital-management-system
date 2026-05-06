@@ -33,19 +33,8 @@ public interface PaymentRepository extends MongoRepository<Payment, String> {
 		@Query("{ 'patient_id': ?0, 'status': ?1, 'deleted_at': null }")
 		Page<Payment> findAllByPatientIdAndStatus(String patientId, PaymentStatus status, Pageable pageable);
 		
-		// ── Single-record finders ────────────────────────────────────────────────
-		
 		Optional<Payment> findByIdAndDeletedAtIsNull(String id);
-		
-		Optional<Payment> findByPaymentNumberAndDeletedAtIsNull(String paymentNumber);
-		
-		Optional<Payment> findByTransactionIdAndDeletedAtIsNull(String transactionId);
-		
-		Optional<Payment> findByInvoiceNumberAndDeletedAtIsNull(String invoiceNumber);
-		
-		// ── Existence checks ─────────────────────────────────────────────────────
 		
 		boolean existsByInvoiceNumberAndDeletedAtIsNull(String invoiceNumber);
 		
-		boolean existsByTransactionIdAndDeletedAtIsNull(String transactionId);
 }

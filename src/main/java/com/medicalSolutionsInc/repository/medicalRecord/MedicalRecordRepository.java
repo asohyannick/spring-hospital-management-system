@@ -9,7 +9,6 @@ import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.time.Instant;
-import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -18,14 +17,6 @@ public interface MedicalRecordRepository extends MongoRepository<MedicalRecord, 
 		Page <MedicalRecord> findByDeletedAtIsNull( Pageable pageable);
 		Optional<MedicalRecord> findByIdAndDeletedAtIsNull(String id);
 		long countByDeletedAtIsNull();
-		
-		Page<MedicalRecord> findByPatientIdAndDeletedAtIsNull(String patientId, Pageable pageable);
-		Page<MedicalRecord> findByAttendingDoctorIdAndDeletedAtIsNull(String doctorId, Pageable pageable);
-		Page<MedicalRecord> findByFacilityIdAndDeletedAtIsNull(String facilityId, Pageable pageable);
-		
-		Page<MedicalRecord> findByStatusAndDeletedAtIsNull(MedicalRecordStatus status, Pageable pageable);
-		Page<MedicalRecord> findByTypeAndDeletedAtIsNull(MedicalRecordType type, Pageable pageable);
-		List<MedicalRecord> findByPatientIdAndDeletedAtIsNull(String patientId);
 		
 		@Query("""
 		            {

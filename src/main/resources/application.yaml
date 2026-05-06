@@ -29,7 +29,12 @@ spring:
     mongodb:
       uri: ${MONGODB_URI}
       database: ${MONGODB_DATABASE}
+      auto-index-creation: false
 
+spring.data.mongodb.option:
+  serverSelectionTimeoutMS: 30000
+  retryWrites: true
+  retryReads: true
 
 server:
   port: ${APPLICATION_PORT}

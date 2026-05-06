@@ -81,6 +81,4 @@ public record LaboratoryResponseDTO(
 		
 		@Schema(description = "Timestamp when the record was last updated")
 		Instant updatedAt
-
-
 ) { }

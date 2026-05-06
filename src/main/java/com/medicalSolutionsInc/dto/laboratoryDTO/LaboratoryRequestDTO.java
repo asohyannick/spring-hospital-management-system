@@ -86,6 +86,4 @@ public record LaboratoryRequestDTO(
 		
 		@Schema(description = "Whether the laboratory accepts online bookings", example = "false")
 		boolean acceptsOnlineBooking
-
-
 ) { }
