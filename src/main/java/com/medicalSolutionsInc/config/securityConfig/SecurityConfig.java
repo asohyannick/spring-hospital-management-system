@@ -220,6 +220,15 @@ public class SecurityConfig {
 							                               .requestMatchers(HttpMethod.GET,    "/api/" + apiVersion + "/patient/*").hasAnyRole("ADMIN", "SUPER_ADMIN", "DOCTOR", "NURSE")
 							                               .requestMatchers(HttpMethod.PUT,    "/api/" + apiVersion + "/patient/*").hasAnyRole("ADMIN", "SUPER_ADMIN", "DOCTOR", "NURSE")
 							                               .requestMatchers(HttpMethod.DELETE, "/api/" + apiVersion + "/patient/*").hasAnyRole("ADMIN", "SUPER_ADMIN")
+							                               
+							                               // ─── Pharmacy Management ───────────────────────────────────────────────────
+							                               .requestMatchers(HttpMethod.POST,   "/api/" + apiVersion + "/pharmacy").hasAnyRole("ADMIN", "SUPER_ADMIN")
+							                               .requestMatchers(HttpMethod.GET,    "/api/" + apiVersion + "/pharmacy").hasAnyRole("ADMIN", "SUPER_ADMIN", "DOCTOR", "NURSE", "PHARMACIST")
+							                               .requestMatchers(HttpMethod.GET,    "/api/" + apiVersion + "/pharmacy/count").hasAnyRole("ADMIN", "SUPER_ADMIN")
+							                               .requestMatchers(HttpMethod.GET,    "/api/" + apiVersion + "/pharmacy/search").hasAnyRole("ADMIN", "SUPER_ADMIN", "DOCTOR", "NURSE", "PHARMACIST")
+							                               .requestMatchers(HttpMethod.GET,    "/api/" + apiVersion + "/pharmacy/*").hasAnyRole("ADMIN", "SUPER_ADMIN", "DOCTOR", "NURSE", "PHARMACIST")
+							                               .requestMatchers(HttpMethod.PUT,    "/api/" + apiVersion + "/pharmacy/*").hasAnyRole("ADMIN", "SUPER_ADMIN")
+							                               .requestMatchers(HttpMethod.DELETE, "/api/" + apiVersion + "/pharmacy/*").hasRole("SUPER_ADMIN")
 														   
 							                               .anyRequest().authenticated ()
 					)

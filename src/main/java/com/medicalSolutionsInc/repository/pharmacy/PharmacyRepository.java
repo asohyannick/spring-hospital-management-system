@@ -7,45 +7,54 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
+import org.springframework.stereotype.Repository;
 
-import java.util.List;
+import java.time.Instant;
 import java.util.Optional;
 
+@Repository
 public interface PharmacyRepository extends MongoRepository<Pharmacy, String> {
 
-		Optional<Pharmacy> findByPharmacyNumber(String pharmacyNumber);
-		
-		Optional<Pharmacy> findByLicenseNumber(String licenseNumber);
-		
-		Optional<Pharmacy> findByEmail(String email);
-		
+		boolean existsByEmail(String email);
 		boolean existsByLicenseNumber(String licenseNumber);
 		
-		boolean existsByEmail(String email);
+		Page<Pharmacy> findByDeletedAtIsNull(Pageable pageable);
+		Optional<Pharmacy> findByIdAndDeletedAtIsNull(String id);
+		long countByDeletedAtIsNull();
 		
-		Page<Pharmacy> findByStatus(PharmacyStatus status, Pageable pageable);
-		
-		Page<Pharmacy> findByType(PharmacyType type, Pageable pageable);
-		
-		Page<Pharmacy> findByTypeAndStatus(PharmacyType type, PharmacyStatus status, Pageable pageable);
-		
-		List<Pharmacy> findByVerifiedTrue();
-		
-		List<Pharmacy> findByOffersDeliveryTrue();
-		
-		List<Pharmacy> findByOpen24HoursTrue();
-		
-		List<Pharmacy> findByAcceptsOnlineOrdersTrue();
-		
-		@Query("{ 'address.city': ?0, 'deleted_at': null }")
-		Page<Pharmacy> findActiveByCity(String city, Pageable pageable);
-		
-		@Query("{ 'address.country': ?0, 'deleted_at': null }")
-		Page<Pharmacy> findActiveByCountry(String country, Pageable pageable);
-		
-		@Query("{ 'total_medications_in_stock': { $lte: '$low_stock_threshold' }, 'deleted_at': null }")
-		List<Pharmacy> findPharmaciesWithLowStock();
-		
-		@Query("{ 'deleted_at': null }")
-		Page<Pharmacy> findAllActive(Pageable pageable);
-}
+		@Query("""
+		            {
+		              "deleted_at": null,
+		              "$and": [
+		                { "$or": [
+		                  { "$expr": { "$eq": [{ "$type": "?0" }, "missing"] } },
+		                  { "name":            { "$regex": "?0", "$options": "i" } },
+		                  { "email":           { "$regex": "?0", "$options": "i" } },
+		                  { "license_number":  { "$regex": "?0", "$options": "i" } },
+		                  { "pharmacy_number": { "$regex": "?0", "$options": "i" } },
+		                  { "head_pharmacist": { "$regex": "?0", "$options": "i" } }
+		                ]},
+		                { "$or": [{ "$expr": { "$eq": [{ "$type": "?1" }, "missing"] } }, { "type": "?1" }] },
+		                { "$or": [{ "$expr": { "$eq": [{ "$type": "?2" }, "missing"] } }, { "status": "?2" }] },
+		                { "$or": [{ "$expr": { "$eq": [{ "$type": "?3" }, "missing"] } }, { "verified": ?3 }] },
+		                { "$or": [{ "$expr": { "$eq": [{ "$type": "?4" }, "missing"] } }, { "open_24_hours": ?4 }] },
+		                { "$or": [{ "$expr": { "$eq": [{ "$type": "?5" }, "missing"] } }, { "offers_delivery": ?5 }] },
+		                { "$or": [{ "$expr": { "$eq": [{ "$type": "?6" }, "missing"] } }, { "accepts_online_orders": ?6 }] },
+		                { "$or": [{ "$expr": { "$eq": [{ "$type": "?7" }, "missing"] } }, { "created_at": { "$gte": "?7" } }] },
+		                { "$or": [{ "$expr": { "$eq": [{ "$type": "?8" }, "missing"] } }, { "created_at": { "$lte": "?8" } }] }
+		              ]
+		            }
+		            """)
+		Page<Pharmacy> search(
+				String keyword,
+				PharmacyType type,
+				PharmacyStatus status,
+				Boolean verified,
+				Boolean open24Hours,
+				Boolean offersDelivery,
+				Boolean acceptsOnlineOrders,
+				Instant from,
+				Instant to,
+				Pageable pageable
+		);
+		}
