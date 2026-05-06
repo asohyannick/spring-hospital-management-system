@@ -75,6 +75,20 @@ public record BookingResponseDTO(
 		@Schema(description = "Insurance number", example = "INS-123456789")
 		String insuranceNumber,
 		
+		@Schema(
+				description = "Check-in date and time (ISO 8601 format)",
+				example = "2026-05-01T14:00:00Z",
+				requiredMode = Schema.RequiredMode.REQUIRED
+		)
+		Instant checkInTime,
+		
+		@Schema(
+				description = "Check-out date and time (must be after check-in time)",
+				example = "2026-05-05T11:00:00Z",
+				requiredMode = Schema.RequiredMode.REQUIRED
+		)
+		Instant checkOutTime,
+		
 		@Schema(description = "Additional notes", example = "Patient has a history of migraines")
 		String notes,
 		

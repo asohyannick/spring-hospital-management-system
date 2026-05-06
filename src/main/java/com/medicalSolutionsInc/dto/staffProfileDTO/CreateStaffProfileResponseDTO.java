@@ -1,0 +1,60 @@
+package com.medicalSolutionsInc.dto.staffProfileDTO;
+
+import com.medicalSolutionsInc.enumerations.bloodGroup.BloodGroup;
+import com.medicalSolutionsInc.enumerations.employmentStatus.EmploymentStatus;
+import com.medicalSolutionsInc.enumerations.employmentType.EmploymentType;
+import com.medicalSolutionsInc.enumerations.genderType.GenderType;
+import com.medicalSolutionsInc.enumerations.maritalStatus.MaritalStatus;
+import com.medicalSolutionsInc.enumerations.shiftType.ShiftType;
+import com.medicalSolutionsInc.enumerations.staffRole.StaffRole;
+
+import java.time.Instant;
+import java.util.List;
+
+public record CreateStaffProfileResponseDTO(
+		
+		String id,
+		String staffNumber,
+		String imageUrl,
+		String firstName,
+		String lastName,
+		String middleName,
+		Instant dateOfBirth,
+		GenderType gender,
+		String nationality,
+		String nationalId,
+		BloodGroup bloodGroup,
+		MaritalStatus maritalStatus,
+		String email,
+		String phoneNumber,
+		String alternatePhone,
+		AddressDTO address,
+		StaffRole role,
+		String department,
+		String specialization,
+		EmploymentType employmentType,
+		EmploymentStatus employmentStatus,
+		Instant hireDate,
+		Instant terminationDate,
+		String facilityId,
+		String facilityName,
+		String supervisorId,
+		String supervisorName,
+		String description,
+		int yearsOfExperience,
+		String licenseNumber,
+		Instant licenseExpiryDate,
+		List<CertificationDTO> certifications,
+		List<EducationDTO> education,
+		List<String> languagesSpoken,
+		List<String> skills,
+		List<String> hobbies,
+		EmergencyContactDTO emergencyContact,
+		ShiftType shift,
+		List<String> workingDays,
+		boolean verified,
+		boolean available,
+		boolean acceptsNewPatients,
+		Instant createdAt,
+		Instant updatedAt
+) {}

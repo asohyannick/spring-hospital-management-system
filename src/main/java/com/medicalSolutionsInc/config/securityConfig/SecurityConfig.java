@@ -193,6 +193,16 @@ public class SecurityConfig {
 							                               .requestMatchers(HttpMethod.GET,    "/api/" + apiVersion + "/booking/*").hasAnyRole("ADMIN", "SUPER_ADMIN")
 							                               .requestMatchers(HttpMethod.PUT,    "/api/" + apiVersion + "/booking/*").hasAnyRole("ADMIN", "SUPER_ADMIN")
 							                               .requestMatchers(HttpMethod.DELETE, "/api/" + apiVersion + "/booking/*").hasRole("SUPER_ADMIN")
+							                               
+							                               // ─── Laboratory Management ─────────────────────────────────────────────────
+							                               .requestMatchers(HttpMethod.POST,   "/api/" + apiVersion + "/lab").hasAnyRole("ADMIN", "SUPER_ADMIN")
+							                               .requestMatchers(HttpMethod.GET,    "/api/" + apiVersion + "/lab").hasAnyRole("ADMIN", "SUPER_ADMIN")
+							                               .requestMatchers(HttpMethod.GET,    "/api/" + apiVersion + "/lab/count").hasAnyRole("ADMIN", "SUPER_ADMIN")
+							                               .requestMatchers(HttpMethod.GET,    "/api/" + apiVersion + "/lab/search").hasAnyRole("ADMIN", "SUPER_ADMIN")
+							                               .requestMatchers(HttpMethod.GET,    "/api/" + apiVersion + "/lab/*").hasAnyRole("ADMIN", "SUPER_ADMIN")
+							                               .requestMatchers(HttpMethod.DELETE, "/api/" + apiVersion + "/lab/*").hasRole("SUPER_ADMIN")
+							                               .requestMatchers(HttpMethod.PUT, "/api/" + apiVersion + "/lab/*").hasAnyRole("ADMIN", "SUPER_ADMIN")
+														   
 							                               .anyRequest().authenticated ()
 					)
 					.exceptionHandling(exception -> exception

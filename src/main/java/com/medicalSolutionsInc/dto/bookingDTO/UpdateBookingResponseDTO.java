@@ -6,6 +6,7 @@ import com.medicalSolutionsInc.enumerations.booking.MaritalStatus;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.*;
 
+import java.time.Instant;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -92,6 +93,24 @@ public record UpdateBookingResponseDTO(
 		
 		@Schema(description = "Gender of the patient", example = "MALE")
 		String gender,
+		
+		@Schema(
+				description = "Check-in date and time (ISO 8601 format)",
+				example = "2026-05-01T14:00:00Z",
+				requiredMode = Schema.RequiredMode.REQUIRED
+		)
+		@NotNull(message = "Check-in time is required")
+		@FutureOrPresent(message = "Check-in time must be in the present or future")
+		Instant checkInTime,
+		
+		@Schema(
+				description = "Check-out date and time (must be after check-in time)",
+				example = "2026-05-05T11:00:00Z",
+				requiredMode = Schema.RequiredMode.REQUIRED
+		)
+		@NotNull(message = "Check-out time is required")
+		@Future(message = "Check-out time must be in the future")
+		Instant checkOutTime,
 		
 		@Schema(description = "Emergency contact name", example = "Jane Doe")
 		@Size(max = 100, message = "Emergency contact name must not exceed 100 characters")

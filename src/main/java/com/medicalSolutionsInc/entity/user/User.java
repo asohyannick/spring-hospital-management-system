@@ -8,6 +8,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.index.Indexed;
 
 import java.time.Instant;
+import java.util.UUID;
 
 @Data
 @Builder
@@ -17,7 +18,7 @@ import java.time.Instant;
 public class User {
 			
 			@Id
-			private String id;
+			private UUID id;
 			
 			private String firstName;
 			

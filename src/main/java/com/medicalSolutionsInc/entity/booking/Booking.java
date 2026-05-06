@@ -10,6 +10,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Getter
 @Setter
@@ -20,7 +21,7 @@ import java.util.List;
 public class Booking {
 
 		@Id
-		private String id;
+		private UUID id;
 		private String imageURL;
 		private String firstName;
 		private String lastName;
@@ -33,6 +34,8 @@ public class Booking {
 		private String zipCode;
 		private String country;
 		private String profession;
+		private Instant checkInTime;
+		private Instant checkOutTime;
 		private MaritalStatus maritalStatus;
 		private LocalDate birthDate;
 		private EmploymentStatus employmentStatus;
