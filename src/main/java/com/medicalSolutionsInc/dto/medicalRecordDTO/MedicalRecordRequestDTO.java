@@ -109,6 +109,5 @@ public record MedicalRecordRequestDTO(
 		
 		@Schema(description = "Whether the record is confidential", example = "false")
 		boolean confidential
-
-
+		
 ) { }
