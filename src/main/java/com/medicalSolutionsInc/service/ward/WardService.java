@@ -1,6 +1,5 @@
 package com.medicalSolutionsInc.service.ward;
 import com.medicalSolutionsInc.config.ApiResponseConfig.ApiResponseConfig;
-import com.medicalSolutionsInc.config.cloudinaryConfig.CloudinaryConfig;
 import com.medicalSolutionsInc.dto.updateWardRequestDTO.UpdateWardRequestDTO;
 import com.medicalSolutionsInc.dto.wardDTO.CreateWardRequestDTO;
 import com.medicalSolutionsInc.dto.wardDTO.CreateWardResponseDTO;
@@ -29,7 +28,6 @@ public class WardService {
 
 		private final WardRepository wardRepository;
 		private final WardMapper wardMapper;
-		private final CloudinaryConfig cloudinaryConfig;
 		private final MongoTemplate mongoTemplate;
 		
 		public ApiResponseConfig<CreateWardResponseDTO> addWard(CreateWardRequestDTO request) {
