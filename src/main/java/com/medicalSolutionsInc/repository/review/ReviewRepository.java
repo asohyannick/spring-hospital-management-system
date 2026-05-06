@@ -7,41 +7,55 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
+import org.springframework.stereotype.Repository;
 
-import java.util.List;
+import java.time.Instant;
 import java.util.Optional;
 
+@Repository
 public interface ReviewRepository extends MongoRepository<Review, String> {
-
-		Optional<Review> findByReviewNumber(String reviewNumber);
-		
-		boolean existsByReviewNumber(String reviewNumber);
-		
-		Page<Review> findByPatientId(String patientId, Pageable pageable);
-		
-		List<Review> findByPatientIdAndStatus(String patientId, ReviewStatus status);
-		
-		Page<Review> findByTargetId(String targetId, Pageable pageable);
-		
-		Page<Review> findByTargetIdAndStatus(String targetId, ReviewStatus status, Pageable pageable);
-		
-		Page<Review> findByTargetIdAndTargetType(String targetId, ReviewTargetType targetType, Pageable pageable);
-		
-		long countByTargetIdAndStatus(String targetId, ReviewStatus status);
-		
-		Page<Review> findByStatus(ReviewStatus status, Pageable pageable);
-		
-		List<Review> findByFeaturedTrue();
-		
-		List<Review> findByReportedCountGreaterThan(int threshold);
-		
-		@Query("{ 'target_id': ?0, 'status': 'APPROVED', 'deleted_at': null }")
-		Page<Review> findApprovedByTargetId(String targetId, Pageable pageable);
-		
-		@Query("{ 'deleted_at': null }")
-		Page<Review> findAllActive(Pageable pageable);
-		
-		@Query(value = "{ 'target_id': ?0, 'status': 'APPROVED', 'deleted_at': null }",
-				fields = "{ 'rating': 1 }")
-		List<Review> findRatingsByTargetId(String targetId);
+			
+			Page<Review> findByDeletedAtIsNull(Pageable pageable);
+			Optional<Review> findByIdAndDeletedAtIsNull(String id);
+			long countByDeletedAtIsNull();
+			
+			@Query("""
+			            {
+			              "deleted_at": null,
+			              "$and": [
+			                { "$or": [
+			                  { "$expr": { "$eq": [{ "$type": "?0" }, "missing"] } },
+			                  { "title":        { "$regex": "?0", "$options": "i" } },
+			                  { "comment":      { "$regex": "?0", "$options": "i" } },
+			                  { "patient_name": { "$regex": "?0", "$options": "i" } },
+			                  { "target_name":  { "$regex": "?0", "$options": "i" } },
+			                  { "tags":         { "$regex": "?0", "$options": "i" } }
+			                ]},
+			                { "$or": [{ "$expr": { "$eq": [{ "$type": "?1" }, "missing"] } }, { "target_type": "?1" }] },
+			                { "$or": [{ "$expr": { "$eq": [{ "$type": "?2" }, "missing"] } }, { "target_id": "?2" }] },
+			                { "$or": [{ "$expr": { "$eq": [{ "$type": "?3" }, "missing"] } }, { "patient_id": "?3" }] },
+			                { "$or": [{ "$expr": { "$eq": [{ "$type": "?4" }, "missing"] } }, { "status": "?4" }] },
+			                { "$or": [{ "$expr": { "$eq": [{ "$type": "?5" }, "missing"] } }, { "rating": { "$gte": ?5 } }] },
+			                { "$or": [{ "$expr": { "$eq": [{ "$type": "?6" }, "missing"] } }, { "rating": { "$lte": ?6 } }] },
+			                { "$or": [{ "$expr": { "$eq": [{ "$type": "?7" }, "missing"] } }, { "verified_visit": ?7 }] },
+			                { "$or": [{ "$expr": { "$eq": [{ "$type": "?8" }, "missing"] } }, { "featured": ?8 }] },
+			                { "$or": [{ "$expr": { "$eq": [{ "$type": "?9" }, "missing"] } }, { "created_at": { "$gte": "?9" } }] },
+			                { "$or": [{ "$expr": { "$eq": [{ "$type": "?10" }, "missing"] } }, { "created_at": { "$lte": "?10" } }] }
+			              ]
+			            }
+			            """)
+			Page<Review> search(
+					String keyword,
+					ReviewTargetType targetType,
+					String targetId,
+					String patientId,
+					ReviewStatus status,
+					Integer minRating,
+					Integer maxRating,
+					Boolean verifiedVisit,
+					Boolean featured,
+					Instant from,
+					Instant to,
+					Pageable pageable
+			);
 }

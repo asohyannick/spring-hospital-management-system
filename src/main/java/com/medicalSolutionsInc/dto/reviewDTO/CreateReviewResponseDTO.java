@@ -60,22 +60,4 @@ public record CreateReviewResponseDTO(
 		Instant createdAt,
 		
 		Instant updatedAt
-) {
-public record AttachmentDTO(
-		String fileName,
-		String fileUrl,
-		String fileType,
-		long fileSizeBytes,
-		Instant uploadedAt
 ) {}
-
-public record ReviewResponseDTO(
-		String responderId,
-		String responderName,
-		String responderRole,
-		String message,
-		Instant respondedAt,
-		boolean edited,
-		Instant editedAt
-) {}
-}

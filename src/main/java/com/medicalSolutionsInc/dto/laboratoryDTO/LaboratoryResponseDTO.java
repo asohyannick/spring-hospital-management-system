@@ -83,29 +83,4 @@ public record LaboratoryResponseDTO(
 		Instant updatedAt
 
 
-) {
-@Schema(name = "Address", description = "Physical address details")
-record AddressDTO(
-		
-		@Schema(description = "Street address", example = "123 Medical Drive")
-		String street,
-		
-		@Schema(description = "City", example = "New York")
-		String city,
-		
-		@Schema(description = "State or province", example = "NY")
-		String state,
-		
-		@Schema(description = "Country", example = "United States")
-		String country,
-		
-		@Schema(description = "Zip or postal code", example = "10001")
-		String zipCode,
-		
-		@Schema(description = "Latitude coordinate", example = "40.7128")
-		double latitude,
-		
-		@Schema(description = "Longitude coordinate", example = "-74.0060")
-		double longitude
-) {}
-}
+) { }

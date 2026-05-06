@@ -1,5 +1,6 @@
 package com.medicalSolutionsInc.mappers.pharmacyMapper;
 
+import com.medicalSolutionsInc.dto.pharmacyDTO.AddressDTO;
 import com.medicalSolutionsInc.dto.pharmacyDTO.CreatePharmacyRequestDTO;
 import com.medicalSolutionsInc.dto.pharmacyDTO.CreatePharmacyResponseDTO;
 import com.medicalSolutionsInc.entity.pharmacy.Pharmacy;
@@ -23,9 +24,9 @@ public interface PharmacyMapper {
 		
 		CreatePharmacyResponseDTO toResponseDTO(Pharmacy pharmacy);
 		
-		Pharmacy.Address toAddress(CreatePharmacyRequestDTO.AddressDTO dto);
+		Pharmacy.Address toAddress(AddressDTO dto);
 		
-		CreatePharmacyResponseDTO.AddressDTO toAddressDTO(Pharmacy.Address address);
+		AddressDTO toAddressDTO( Pharmacy.Address address);
 		
 		@Mapping(target = "id",                      ignore = true)
 		@Mapping(target = "pharmacyNumber",          ignore = true)

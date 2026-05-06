@@ -1,7 +1,6 @@
 package com.medicalSolutionsInc.mappers.paymentMapper;
 
-import com.medicalSolutionsInc.dto.paymentDTO.PaymentRequestDTO;
-import com.medicalSolutionsInc.dto.paymentDTO.PaymentResponseDTO;
+import com.medicalSolutionsInc.dto.paymentDTO.*;
 import com.medicalSolutionsInc.entity.payment.Payment;
 import org.mapstruct.*;
 
@@ -38,15 +37,15 @@ public interface PaymentMapper {
 		
 		List<PaymentResponseDTO> toResponseList(List<Payment> payments);
 		
-		PaymentResponseDTO.PaymentMethodDetailsResponseDTO toPaymentMethodDetailsResponse(
+		PaymentMethodDetailsResponseDTO toPaymentMethodDetailsResponse(
 				Payment.PaymentMethodDetails details
 		);
 		
 		Payment.PaymentMethodDetails toPaymentMethodDetailsEntity(
-				PaymentRequestDTO.PaymentMethodDetailsDTO dto
+				PaymentMethodDetailsDTO dto
 		);
 		
-		PaymentResponseDTO.RefundResponseDTO toRefundResponse(Payment.Refund refund);
+		RefundResponseDTO toRefundResponse( Payment.Refund refund);
 		
 		@BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
 		@Mapping(target = "id",                    ignore = true)

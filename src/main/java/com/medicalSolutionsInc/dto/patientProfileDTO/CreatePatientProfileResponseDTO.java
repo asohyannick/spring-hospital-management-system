@@ -104,35 +104,4 @@ public record CreatePatientProfileResponseDTO(
 		@Schema(description = "Timestamp when the profile was last updated")
 		Instant updatedAt
 
-) {
-@Schema(name = "Address", description = "Residential address details")
-record AddressDTO(
-		String street,
-		String city,
-		String state,
-		String country,
-		String zipCode,
-		double latitude,
-		double longitude
-) {}
-
-@Schema(name = "EmergencyContact", description = "Emergency contact details")
-record EmergencyContactDTO(
-		String fullName,
-		String relationship,
-		String phoneNumber,
-		String alternatePhone,
-		String email,
-		AddressDTO address
-) {}
-
-@Schema(name = "Insurance", description = "Health insurance details")
-record InsuranceDTO(
-		String providerName,
-		String policyNumber,
-		String groupNumber,
-		String coverageType,
-		Instant expiryDate,
-		boolean active
-) {}
-}
+) { }

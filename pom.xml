@@ -28,6 +28,7 @@
         <spring-dotenv.version>4.0.0</spring-dotenv.version>
         <google-genai.version>1.51.0</google-genai.version>
         <cloudinary.version>2.3.2</cloudinary.version>
+        <twilio.version>12.0.0</twilio.version>
     </properties>
 
     <dependencies>
@@ -35,7 +36,11 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
-
+        <dependency>
+            <groupId>com.twilio.sdk</groupId>
+            <artifactId>twilio</artifactId>
+            <version>${twilio.version}</version>
+        </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-mongodb</artifactId>

@@ -71,14 +71,4 @@ public record CreatePharmacyResponseDTO(
 		Instant createdAt,
 		
 		Instant updatedAt
-) {
-public record AddressDTO(
-		String street,
-		String city,
-		String state,
-		String country,
-		String zipCode,
-		double latitude,
-		double longitude
-) {}
-}
+) { }

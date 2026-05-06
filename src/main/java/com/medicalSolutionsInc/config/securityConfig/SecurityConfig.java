@@ -229,6 +229,48 @@ public class SecurityConfig {
 							                               .requestMatchers(HttpMethod.GET,    "/api/" + apiVersion + "/pharmacy/*").hasAnyRole("ADMIN", "SUPER_ADMIN", "DOCTOR", "NURSE", "PHARMACIST")
 							                               .requestMatchers(HttpMethod.PUT,    "/api/" + apiVersion + "/pharmacy/*").hasAnyRole("ADMIN", "SUPER_ADMIN")
 							                               .requestMatchers(HttpMethod.DELETE, "/api/" + apiVersion + "/pharmacy/*").hasRole("SUPER_ADMIN")
+							                               
+							                               // ─── Review Management ─────────────────────────────────────────────────────
+							                               .requestMatchers(HttpMethod.POST,   "/api/" + apiVersion + "/review").hasAnyRole("ADMIN", "SUPER_ADMIN", "PATIENT")
+							                               .requestMatchers(HttpMethod.GET,    "/api/" + apiVersion + "/review").hasAnyRole("ADMIN", "SUPER_ADMIN", "DOCTOR", "NURSE")
+							                               .requestMatchers(HttpMethod.GET,    "/api/" + apiVersion + "/review/count").hasAnyRole("ADMIN", "SUPER_ADMIN")
+							                               .requestMatchers(HttpMethod.GET,    "/api/" + apiVersion + "/review/search").hasAnyRole("ADMIN", "SUPER_ADMIN", "DOCTOR", "NURSE")
+							                               .requestMatchers(HttpMethod.GET,    "/api/" + apiVersion + "/review/*").hasAnyRole("ADMIN", "SUPER_ADMIN", "DOCTOR", "NURSE", "PATIENT")
+							                               .requestMatchers(HttpMethod.PUT,    "/api/" + apiVersion + "/review/*").hasAnyRole("ADMIN", "SUPER_ADMIN", "PATIENT")
+							                               .requestMatchers(HttpMethod.DELETE, "/api/" + apiVersion + "/review/*").hasAnyRole("ADMIN", "SUPER_ADMIN")
+														   
+							                               // ─── Staff Profile Management ──────────────────────────────────────────────
+							                               .requestMatchers(HttpMethod.POST,   "/api/" + apiVersion + "/staff-profile").hasAnyRole("ADMIN", "SUPER_ADMIN")
+							                               .requestMatchers(HttpMethod.GET,    "/api/" + apiVersion + "/staff-profile").hasAnyRole("ADMIN", "SUPER_ADMIN")
+							                               .requestMatchers(HttpMethod.GET,    "/api/" + apiVersion + "/staff-profile/count").hasAnyRole("ADMIN", "SUPER_ADMIN")
+							                               .requestMatchers(HttpMethod.GET,    "/api/" + apiVersion + "/staff-profile/search").hasAnyRole("ADMIN", "SUPER_ADMIN")
+							                               .requestMatchers(HttpMethod.GET,    "/api/" + apiVersion + "/staff-profile/*").hasAnyRole("ADMIN", "SUPER_ADMIN", "DOCTOR", "NURSE")
+							                               .requestMatchers(HttpMethod.PUT,    "/api/" + apiVersion + "/staff-profile/*").hasAnyRole("ADMIN", "SUPER_ADMIN")
+							                               .requestMatchers(HttpMethod.DELETE, "/api/" + apiVersion + "/staff-profile/*").hasRole("SUPER_ADMIN")
+							                               
+							                               // ─── Ward Management ──────────────────────────────────────────────────────
+							                               .requestMatchers(HttpMethod.POST,   "/api/" + apiVersion + "/ward").hasAnyRole("ADMIN", "SUPER_ADMIN")
+							                               .requestMatchers(HttpMethod.GET,    "/api/" + apiVersion + "/ward").hasAnyRole("ADMIN", "SUPER_ADMIN")
+							                               .requestMatchers(HttpMethod.GET,    "/api/" + apiVersion + "/ward/count").hasAnyRole("ADMIN", "SUPER_ADMIN")
+							                               .requestMatchers(HttpMethod.GET,    "/api/" + apiVersion + "/ward/search").hasAnyRole("ADMIN", "SUPER_ADMIN")
+							                               .requestMatchers(HttpMethod.GET,    "/api/" + apiVersion + "/ward/*").hasAnyRole("ADMIN", "SUPER_ADMIN")
+							                               .requestMatchers(HttpMethod.PUT,    "/api/" + apiVersion + "/ward/*").hasAnyRole("ADMIN", "SUPER_ADMIN")
+							                               .requestMatchers(HttpMethod.DELETE, "/api/" + apiVersion + "/ward/*").hasRole("SUPER_ADMIN")
+							                               
+							                               // ─── Notification Management ──────────────────────────────────────────────
+							                               // Send endpoints — ADMIN / SUPER_ADMIN only
+							                               .requestMatchers(HttpMethod.POST,   "/api/" + apiVersion + "/notify/email").hasAnyRole("ADMIN", "SUPER_ADMIN")
+							                               .requestMatchers(HttpMethod.POST,   "/api/" + apiVersion + "/notify/sms").hasAnyRole("ADMIN", "SUPER_ADMIN")
+							                               .requestMatchers(HttpMethod.POST,   "/api/" + apiVersion + "/notify/in-app").hasAnyRole("ADMIN", "SUPER_ADMIN")
+							                               .requestMatchers(HttpMethod.POST,   "/api/" + apiVersion + "/notify/broadcast").hasAnyRole("ADMIN", "SUPER_ADMIN")
+							                               // Subscription management — any authenticated user (self-service)
+							                               .requestMatchers(HttpMethod.POST,   "/api/" + apiVersion + "/notify/subscribe").authenticated()
+							                               .requestMatchers(HttpMethod.DELETE, "/api/" + apiVersion + "/notify/unsubscribe/*").authenticated()
+							                               .requestMatchers(HttpMethod.GET,    "/api/" + apiVersion + "/notify/subscription/*").authenticated()
+							                               // Recipient notification feed — authenticated users (own feed)
+							                               .requestMatchers(HttpMethod.GET,    "/api/" + apiVersion + "/notify/*").authenticated()
+							                               .requestMatchers(HttpMethod.PATCH,  "/api/" + apiVersion + "/notify/*/read").authenticated()
+							                               .requestMatchers(HttpMethod.PATCH,  "/api/" + apiVersion + "/notify/*/archive").authenticated()
 														   
 							                               .anyRequest().authenticated ()
 					)

@@ -115,47 +115,4 @@ public record MedicalRecordResponseDTO(
 		Instant updatedAt
 
 
-) {
-@Schema(name = "Prescription", description = "Prescription details")
-record PrescriptionDTO(
-		String medicationName,
-		String dosage,
-		String frequency,
-		String duration,
-		String instructions,
-		Instant prescribedAt
 ) {}
-
-@Schema(name = "LabResult", description = "Laboratory test result details")
-record LabResultDTO(
-		String testName,
-		String result,
-		String unit,
-		String referenceRange,
-		boolean abnormal,
-		Instant testedAt,
-		String laboratoryId
-) {}
-
-@Schema(name = "VitalSigns", description = "Patient vital signs")
-record VitalSignsDTO(
-		String bloodPressure,
-		double temperature,
-		int heartRate,
-		int respiratoryRate,
-		double weight,
-		double height,
-		double bmi,
-		int oxygenSaturation,
-		Instant recordedAt
-) {}
-
-@Schema(name = "Attachment", description = "Attached file details")
-record AttachmentDTO(
-		String fileName,
-		String fileUrl,
-		String fileType,
-		long fileSizeBytes,
-		Instant uploadedAt
-) {}
-}

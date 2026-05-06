@@ -96,7 +96,7 @@ public class PharmacyController {
 		@GetMapping("/{id}")
 		public ResponseEntity<ApiResponseConfig<CreatePharmacyResponseDTO>> fetchPharmacy(
 				@Parameter(description = "Pharmacy ID") @PathVariable String id
-		) {
+		) throws Exception {
 			return ResponseEntity.ok(new ApiResponseConfig<>(
 					Instant.now(),
 					"Pharmacy retrieved successfully",
@@ -141,7 +141,7 @@ public class PharmacyController {
 		@DeleteMapping("/{id}")
 		public ResponseEntity<ApiResponseConfig<Void>> deletePharmacy(
 				@Parameter(description = "Pharmacy ID") @PathVariable String id
-		) {
+		) throws  Exception {
 			pharmacyService.deletePharmacy(id);
 			return ResponseEntity.ok(new ApiResponseConfig<>(
 					Instant.now(),

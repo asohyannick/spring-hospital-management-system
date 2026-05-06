@@ -1,10 +1,10 @@
 package com.medicalSolutionsInc.entity.medicalRecord;
 
 import com.medicalSolutionsInc.enumerations.bloodGroup.BloodGroup;
+import com.medicalSolutionsInc.enumerations.genderType.GenderType;
 import com.medicalSolutionsInc.enumerations.medicalRecordStatus.MedicalRecordStatus;
 import com.medicalSolutionsInc.enumerations.medicalRecordType.MedicalRecordType;
 import com.medicalSolutionsInc.enumerations.visitType.VisitType;
-import com.nimbusds.openid.connect.sdk.claims.Gender;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
@@ -59,7 +59,7 @@ public class MedicalRecord {
 		private BloodGroup bloodGroup;
 		
 		@Field("patient_gender")
-		private Gender gender;
+		private GenderType gender;
 		
 		@Indexed
 		@Field("attending_doctor_id")
