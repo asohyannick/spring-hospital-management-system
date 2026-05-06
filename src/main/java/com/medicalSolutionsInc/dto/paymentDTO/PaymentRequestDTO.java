@@ -1,6 +1,5 @@
 package com.medicalSolutionsInc.dto.paymentDTO;
 
-import com.medicalSolutionsInc.enumerations.paymentStatus.PaymentStatus;
 import com.medicalSolutionsInc.enumerations.paymentType.PaymentType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.*;

@@ -32,8 +32,7 @@ public class NotificationService {
 		private final SmsService smsService;
 		
 		// ─── Send Notification (EMAIL) ────────────────────────────────────────────────
-		
-		/**
+			/**
 		 * Sends an email notification to the specified recipient and persists a record.
 		 * Validates that the recipient has an active subscription with EMAIL channel before dispatching.
 		 */

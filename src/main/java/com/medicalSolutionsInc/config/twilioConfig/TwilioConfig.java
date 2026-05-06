@@ -21,9 +21,11 @@ public class TwilioConfig {
 		
 		@Value("${twilio.phone-number}")
 		private String phoneNumber;
-		
+
 		@PostConstruct
 		public void initTwilio() {
+			log.info("Twilio SID: {}", accountSid.substring(0, 6) + "...");
+			log.info("Twilio Auth Token present: {}", authToken != null && !authToken.isBlank());
 			Twilio.init(accountSid, authToken);
 			log.info("Twilio client initialised — sending from: {}", phoneNumber);
 		}
