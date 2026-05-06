@@ -176,6 +176,11 @@ public class SecurityConfig {
 					.addFilterBefore(rateLimitFilter, ChannelProcessingFilter.class)
 					.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
 					.authorizeHttpRequests(auth -> auth
+														   
+							                               .requestMatchers("/actuator/health", "/actuator/info", "/actuator/metrics", "/actuator/loggers", "/actuator/beans")
+							                               .hasAnyRole("ADMIN", "SUPER_ADMIN")
+							                               .requestMatchers("/actuator/**").hasRole("SUPER_ADMIN")
+														   
 							                               .requestMatchers(HttpMethod.GET, "/v3/api-docs/**", "/swagger-ui/**", "/webjars/**").permitAll()
 							                               .requestMatchers(publicEndpoints()).permitAll()
 														   
@@ -271,6 +276,13 @@ public class SecurityConfig {
 							                               .requestMatchers(HttpMethod.GET,    "/api/" + apiVersion + "/notify/*").authenticated()
 							                               .requestMatchers(HttpMethod.PATCH,  "/api/" + apiVersion + "/notify/*/read").authenticated()
 							                               .requestMatchers(HttpMethod.PATCH,  "/api/" + apiVersion + "/notify/*/archive").authenticated()
+							                               
+							                               // ─── Payment Management ────────────────────────────────────────────────────
+							                               .requestMatchers(HttpMethod.POST,   "/api/" + apiVersion + "/payment/checkout").hasAnyRole("ADMIN", "SUPER_ADMIN", "DOCTOR", "NURSE", "PATIENT")
+							                               .requestMatchers(HttpMethod.GET,    "/api/" + apiVersion + "/payment").hasAnyRole("ADMIN", "SUPER_ADMIN", "DOCTOR", "NURSE")
+							                               .requestMatchers(HttpMethod.GET,    "/api/" + apiVersion + "/payment/*").hasAnyRole("ADMIN", "SUPER_ADMIN", "DOCTOR", "NURSE", "PATIENT")
+							                               .requestMatchers(HttpMethod.DELETE, "/api/" + apiVersion + "/payment/*").hasAnyRole("ADMIN", "SUPER_ADMIN")
+							                               .requestMatchers(HttpMethod.POST,   "/api/" + apiVersion + "/payment/*/refund").hasAnyRole("ADMIN", "SUPER_ADMIN")
 														   
 							                               .anyRequest().authenticated ()
 					)

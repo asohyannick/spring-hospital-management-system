@@ -48,6 +48,15 @@ twilio:
   auth-token: ${TWILIO_AUTH_TOKEN}
   phone-number: ${TWILIO_PHONE_NUMBER}
 
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info, metrics, loggers, env, beans
+  endpoint:
+    health:
+      show-details: always
+
 
 firebase:
   project-id: ${FIREBASE_PROJECT_ID}
