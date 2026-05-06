@@ -202,6 +202,24 @@ public class SecurityConfig {
 							                               .requestMatchers(HttpMethod.GET,    "/api/" + apiVersion + "/lab/*").hasAnyRole("ADMIN", "SUPER_ADMIN")
 							                               .requestMatchers(HttpMethod.DELETE, "/api/" + apiVersion + "/lab/*").hasRole("SUPER_ADMIN")
 							                               .requestMatchers(HttpMethod.PUT, "/api/" + apiVersion + "/lab/*").hasAnyRole("ADMIN", "SUPER_ADMIN")
+							                               
+							                               // ─── Medical Record Management ─────────────────────────────────────────────
+							                               .requestMatchers(HttpMethod.POST,   "/api/" + apiVersion + "/medical-record").hasAnyRole("ADMIN", "SUPER_ADMIN", "DOCTOR")
+							                               .requestMatchers(HttpMethod.GET,    "/api/" + apiVersion + "/medical-record").hasAnyRole("ADMIN", "SUPER_ADMIN", "DOCTOR", "NURSE")
+							                               .requestMatchers(HttpMethod.GET,    "/api/" + apiVersion + "/medical-record/count").hasAnyRole("ADMIN", "SUPER_ADMIN")
+							                               .requestMatchers(HttpMethod.GET,    "/api/" + apiVersion + "/medical-record/search").hasAnyRole("ADMIN", "SUPER_ADMIN", "DOCTOR", "NURSE")
+							                               .requestMatchers(HttpMethod.GET,    "/api/" + apiVersion + "/medical-record/*").hasAnyRole("ADMIN", "SUPER_ADMIN", "DOCTOR", "NURSE")
+							                               .requestMatchers(HttpMethod.PUT,    "/api/" + apiVersion + "/medical-record/*").hasAnyRole("ADMIN", "SUPER_ADMIN", "DOCTOR")
+							                               .requestMatchers(HttpMethod.DELETE, "/api/" + apiVersion + "/medical-record/*").hasAnyRole("ADMIN", "SUPER_ADMIN")
+							                               
+							                               // ─── Patient Profile Management ────────────────────────────────────────────
+							                               .requestMatchers(HttpMethod.POST,   "/api/" + apiVersion + "/patient").hasAnyRole("ADMIN", "SUPER_ADMIN", "DOCTOR", "NURSE")
+							                               .requestMatchers(HttpMethod.GET,    "/api/" + apiVersion + "/patient").hasAnyRole("ADMIN", "SUPER_ADMIN", "DOCTOR", "NURSE")
+							                               .requestMatchers(HttpMethod.GET,    "/api/" + apiVersion + "/patient/count").hasAnyRole("ADMIN", "SUPER_ADMIN")
+							                               .requestMatchers(HttpMethod.GET,    "/api/" + apiVersion + "/patient/search").hasAnyRole("ADMIN", "SUPER_ADMIN", "DOCTOR", "NURSE")
+							                               .requestMatchers(HttpMethod.GET,    "/api/" + apiVersion + "/patient/*").hasAnyRole("ADMIN", "SUPER_ADMIN", "DOCTOR", "NURSE")
+							                               .requestMatchers(HttpMethod.PUT,    "/api/" + apiVersion + "/patient/*").hasAnyRole("ADMIN", "SUPER_ADMIN", "DOCTOR", "NURSE")
+							                               .requestMatchers(HttpMethod.DELETE, "/api/" + apiVersion + "/patient/*").hasAnyRole("ADMIN", "SUPER_ADMIN")
 														   
 							                               .anyRequest().authenticated ()
 					)

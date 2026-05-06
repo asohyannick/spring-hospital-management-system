@@ -4,10 +4,13 @@ import com.medicalSolutionsInc.entity.patientProfile.PatientProfile;
 import com.medicalSolutionsInc.enumerations.bloodGroup.BloodGroup;
 import com.medicalSolutionsInc.enumerations.genderType.GenderType;
 import com.medicalSolutionsInc.enumerations.maritalStatus.MaritalStatus;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
@@ -15,68 +18,54 @@ import java.util.Optional;
 public interface PatientProfileRepository extends MongoRepository<PatientProfile, String> {
 
 		boolean existsByEmail(String email);
-		boolean existsByPatientNumber(String patientNumber);
 		boolean existsByNationalId(String nationalId);
-		boolean existsByPhoneNumber(String phoneNumber);
+		boolean existsByPatientNumber(String patientNumber);
 		
-		Optional<PatientProfile> findByEmail(String email);
-		Optional<PatientProfile> findByPatientNumber(String patientNumber);
-		Optional<PatientProfile> findByNationalId(String nationalId);
+		Page<PatientProfile> findByDeletedAtIsNull(Pageable pageable);
+		Optional<PatientProfile> findByIdAndDeletedAtIsNull(String id);
+		long countByDeletedAtIsNull();
 		
-		@Query("{ 'deleted_at': null }")
-		List<PatientProfile> findAllActive();
+		List<PatientProfile> findByPrimaryDoctorIdAndDeletedAtIsNull(String doctorId);
+		Page<PatientProfile> findByPrimaryDoctorIdAndDeletedAtIsNull(String doctorId, Pageable pageable);
+		Page<PatientProfile> findByGenderAndDeletedAtIsNull(GenderType gender, Pageable pageable);
+		Page<PatientProfile> findByBloodGroupAndDeletedAtIsNull(BloodGroup bloodGroup, Pageable pageable);
+		Page<PatientProfile> findByActiveAndDeletedAtIsNull(boolean active, Pageable pageable);
+		Page<PatientProfile> findByDeceasedAndDeletedAtIsNull(boolean deceased, Pageable pageable);
 		
-		@Query("{ '_id': ?0, 'deleted_at': null }")
-		Optional<PatientProfile> findActiveById(String id);
-		
-		@Query("{ 'email': ?0, 'deleted_at': null }")
-		Optional<PatientProfile> findActiveByEmail(String email);
-		
-		@Query("{ 'patient_number': ?0, 'deleted_at': null }")
-		Optional<PatientProfile> findActiveByPatientNumber(String patientNumber);
-		
-		@Query("{ 'primary_doctor_id': ?0, 'deleted_at': null }")
-		List<PatientProfile> findAllActiveByDoctorId(String doctorId);
-		
-		List<PatientProfile> findByGender(GenderType gender);
-		List<PatientProfile> findByBloodGroup(BloodGroup bloodGroup);
-		List<PatientProfile> findByMaritalStatus(MaritalStatus maritalStatus);
-		List<PatientProfile> findByNationality(String nationality);
-		
-		@Query("{ 'address.city': ?0, 'deleted_at': null }")
-		List<PatientProfile> findActiveByCity(String city);
-		
-		@Query("{ 'address.state': ?0, 'deleted_at': null }")
-		List<PatientProfile> findActiveByState(String state);
-		
-		@Query("{ 'address.country': ?0, 'deleted_at': null }")
-		List<PatientProfile> findActiveByCountry(String country);
-		
-		@Query("{ 'first_name': { $regex: ?0, $options: 'i' }, 'deleted_at': null }")
-		List<PatientProfile> searchByFirstName(String firstName);
-		
-		@Query("{ 'last_name': { $regex: ?0, $options: 'i' }, 'deleted_at': null }")
-		List<PatientProfile> searchByLastName(String lastName);
-		
-		@Query("{ $or: [ { 'first_name': { $regex: ?0, $options: 'i' } }, { 'last_name': { $regex: ?0, $options: 'i' } } ], 'deleted_at': null }")
-		List<PatientProfile> searchByName(String name);
-		
-		@Query("{ 'is_active': true, 'deleted_at': null }")
-		List<PatientProfile> findAllActivePatients();
-		
-		@Query("{ 'is_deceased': true }")
-		List<PatientProfile> findAllDeceased();
-		
-		@Query("{ 'insurance.active': true, 'deleted_at': null }")
-		List<PatientProfile> findAllWithActiveInsurance();
-		
-		long countByGender(GenderType gender);
-		long countByBloodGroup(BloodGroup bloodGroup);
-		long countByNationality(String nationality);
-		
-		@Query(value = "{ 'deleted_at': null }", count = true)
-		long countAllActive();
-		
-		@Query(value = "{ 'is_deceased': true }", count = true)
-		long countAllDeceased();
+		@Query("""
+		            {
+		              "deleted_at": null,
+		              "$and": [
+		                { "$or": [
+		                  { "$expr": { "$eq": [{ "$type": "?0" }, "missing"] } },
+		                  { "first_name":    { "$regex": "?0", "$options": "i" } },
+		                  { "last_name":     { "$regex": "?0", "$options": "i" } },
+		                  { "email":         { "$regex": "?0", "$options": "i" } },
+		                  { "phone_number":  { "$regex": "?0", "$options": "i" } },
+		                  { "patient_number":{ "$regex": "?0", "$options": "i" } },
+		                  { "national_id":   { "$regex": "?0", "$options": "i" } }
+		                ]},
+		                { "$or": [{ "$expr": { "$eq": [{ "$type": "?1" }, "missing"] } }, { "gender": "?1" }] },
+		                { "$or": [{ "$expr": { "$eq": [{ "$type": "?2" }, "missing"] } }, { "blood_group": "?2" }] },
+		                { "$or": [{ "$expr": { "$eq": [{ "$type": "?3" }, "missing"] } }, { "marital_status": "?3" }] },
+		                { "$or": [{ "$expr": { "$eq": [{ "$type": "?4" }, "missing"] } }, { "primary_doctor_id": "?4" }] },
+		                { "$or": [{ "$expr": { "$eq": [{ "$type": "?5" }, "missing"] } }, { "active": ?5 }] },
+		                { "$or": [{ "$expr": { "$eq": [{ "$type": "?6" }, "missing"] } }, { "deceased": ?6 }] },
+		                { "$or": [{ "$expr": { "$eq": [{ "$type": "?7" }, "missing"] } }, { "created_at": { "$gte": "?7" } }] },
+		                { "$or": [{ "$expr": { "$eq": [{ "$type": "?8" }, "missing"] } }, { "created_at": { "$lte": "?8" } }] }
+		              ]
+		            }
+		            """)
+		Page<PatientProfile> search(
+				String keyword,
+				GenderType gender,
+				BloodGroup bloodGroup,
+				MaritalStatus maritalStatus,
+				String primaryDoctorId,
+				Boolean active,
+				Boolean deceased,
+				Instant from,
+				Instant to,
+				Pageable pageable
+		);
 }

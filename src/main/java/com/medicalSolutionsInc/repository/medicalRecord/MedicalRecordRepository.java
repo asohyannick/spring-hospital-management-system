@@ -2,7 +2,8 @@ package com.medicalSolutionsInc.repository.medicalRecord;
 import com.medicalSolutionsInc.entity.medicalRecord.MedicalRecord;
 import com.medicalSolutionsInc.enumerations.medicalRecordStatus.MedicalRecordStatus;
 import com.medicalSolutionsInc.enumerations.medicalRecordType.MedicalRecordType;
-import com.medicalSolutionsInc.enumerations.visitType.VisitType;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -13,64 +14,49 @@ import java.util.Optional;
 
 @Repository
 public interface MedicalRecordRepository extends MongoRepository<MedicalRecord, String> {
-
-		boolean existsByRecordNumber(String recordNumber);
-		boolean existsByPatientIdAndType(String patientId, MedicalRecordType type);
 		
-		Optional<MedicalRecord> findByRecordNumber(String recordNumber);
+		Page <MedicalRecord> findByDeletedAtIsNull( Pageable pageable);
+		Optional<MedicalRecord> findByIdAndDeletedAtIsNull(String id);
+		long countByDeletedAtIsNull();
 		
-		@Query("{ 'deleted_at': null }")
-		List<MedicalRecord> findAllActive();
+		Page<MedicalRecord> findByPatientIdAndDeletedAtIsNull(String patientId, Pageable pageable);
+		Page<MedicalRecord> findByAttendingDoctorIdAndDeletedAtIsNull(String doctorId, Pageable pageable);
+		Page<MedicalRecord> findByFacilityIdAndDeletedAtIsNull(String facilityId, Pageable pageable);
 		
-		@Query("{ '_id': ?0, 'deleted_at': null }")
-		Optional<MedicalRecord> findActiveById(String id);
+		Page<MedicalRecord> findByStatusAndDeletedAtIsNull(MedicalRecordStatus status, Pageable pageable);
+		Page<MedicalRecord> findByTypeAndDeletedAtIsNull(MedicalRecordType type, Pageable pageable);
+		List<MedicalRecord> findByPatientIdAndDeletedAtIsNull(String patientId);
 		
-		@Query("{ 'record_number': ?0, 'deleted_at': null }")
-		Optional<MedicalRecord> findActiveByRecordNumber(String recordNumber);
-		
-		@Query("{ 'patient_id': ?0, 'deleted_at': null }")
-		List<MedicalRecord> findAllActiveByPatientId(String patientId);
-		
-		@Query("{ 'patient_id': ?0, 'type': ?1, 'deleted_at': null }")
-		List<MedicalRecord> findByPatientIdAndType(String patientId, MedicalRecordType type);
-		
-		@Query("{ 'patient_id': ?0, 'status': ?1, 'deleted_at': null }")
-		List<MedicalRecord> findByPatientIdAndStatus(String patientId, MedicalRecordStatus status);
-		
-		@Query("{ 'attending_doctor_id': ?0, 'deleted_at': null }")
-		List<MedicalRecord> findAllActiveByDoctorId(String doctorId);
-		
-		@Query("{ 'attending_doctor_id': ?0, 'status': ?1, 'deleted_at': null }")
-		List<MedicalRecord> findByDoctorIdAndStatus(String doctorId, MedicalRecordStatus status);
-		
-		List<MedicalRecord> findByType(MedicalRecordType type);
-		List<MedicalRecord> findByStatus(MedicalRecordStatus status);
-		List<MedicalRecord> findByTypeAndStatus(MedicalRecordType type, MedicalRecordStatus status);
-		
-		List<MedicalRecord> findByVisitType(VisitType visitType);
-		
-		@Query("{ 'facility_id': ?0, 'deleted_at': null }")
-		List<MedicalRecord> findAllActiveByFacilityId(String facilityId);
-		
-		@Query("{ 'department': ?0, 'deleted_at': null }")
-		List<MedicalRecord> findAllActiveByDepartment(String department);
-		
-		@Query("{ 'check_in': { $gte: ?0, $lte: ?1 }, 'deleted_at': null }")
-		List<MedicalRecord> findByCheckInBetween(Instant from, Instant to);
-		
-		@Query("{ 'created_at': { $gte: ?0, $lte: ?1 }, 'deleted_at': null }")
-		List<MedicalRecord> findByCreatedAtBetween(Instant from, Instant to);
-		
-		@Query("{ 'is_confidential': true, 'deleted_at': null }")
-		List<MedicalRecord> findAllConfidential();
-		
-		@Query("{ 'is_archived': true }")
-		List<MedicalRecord> findAllArchived();
-		
-		long countByStatus(MedicalRecordStatus status);
-		long countByType(MedicalRecordType type);
-		long countByPatientId(String patientId);
-		
-		@Query(value = "{ 'deleted_at': null }", count = true)
-		long countAllActive();
+		@Query("""
+		            {
+		              "deleted_at": null,
+		              "$and": [
+		                { "$or": [
+		                  { "$expr": { "$eq": [{ "$type": "?0" }, "missing"] } },
+		                  { "patient_name":    { "$regex": "?0", "$options": "i" } },
+		                  { "title":           { "$regex": "?0", "$options": "i" } },
+		                  { "chief_complaint": { "$regex": "?0", "$options": "i" } },
+		                  { "record_number":   { "$regex": "?0", "$options": "i" } }
+		                ]},
+		                { "$or": [{ "$expr": { "$eq": [{ "$type": "?1" }, "missing"] } }, { "status": "?1" }] },
+		                { "$or": [{ "$expr": { "$eq": [{ "$type": "?2" }, "missing"] } }, { "type": "?2" }] },
+		                { "$or": [{ "$expr": { "$eq": [{ "$type": "?3" }, "missing"] } }, { "patient_id": "?3" }] },
+		                { "$or": [{ "$expr": { "$eq": [{ "$type": "?4" }, "missing"] } }, { "attending_doctor_id": "?4" }] },
+		                { "$or": [{ "$expr": { "$eq": [{ "$type": "?5" }, "missing"] } }, { "facility_id": "?5" }] },
+		                { "$or": [{ "$expr": { "$eq": [{ "$type": "?6" }, "missing"] } }, { "created_at": { "$gte": "?6" } }] },
+		                { "$or": [{ "$expr": { "$eq": [{ "$type": "?7" }, "missing"] } }, { "created_at": { "$lte": "?7" } }] }
+		              ]
+		            }
+		            """)
+		Page<MedicalRecord> search(
+				String keyword,
+				MedicalRecordStatus status,
+				MedicalRecordType type,
+				String patientId,
+				String attendingDoctorId,
+				String facilityId,
+				Instant from,
+				Instant to,
+				Pageable pageable
+		);
 }
