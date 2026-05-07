@@ -61,7 +61,15 @@ management:
   endpoint:
     health:
       show-details: always
+  health:
+    redis:
+      enabled: false
 
+groq:
+  api-key: ${GROQ_API_KEY}
+  model: llama-3.1-8b-instant
+  base-url: https://api.groq.com/openai/v1
+  max-tokens: 1000
 
 firebase:
   project-id: ${FIREBASE_PROJECT_ID}

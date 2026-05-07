@@ -283,8 +283,14 @@ public class SecurityConfig {
 							                               .requestMatchers(HttpMethod.GET,    "/api/" + apiVersion + "/payment/*").hasAnyRole("ADMIN", "SUPER_ADMIN", "DOCTOR", "NURSE", "PATIENT")
 							                               .requestMatchers(HttpMethod.DELETE, "/api/" + apiVersion + "/payment/*").hasAnyRole("ADMIN", "SUPER_ADMIN")
 							                               .requestMatchers(HttpMethod.POST,   "/api/" + apiVersion + "/payment/*/refund").hasAnyRole("ADMIN", "SUPER_ADMIN")
+							                               
+														   // _____ AI ChatBot ___________________________
+							                               .requestMatchers(HttpMethod.POST, "/api/" + apiVersion + "/chatbot/chat")
+							                               .authenticated()
+							                               .requestMatchers(HttpMethod.POST, "/api/" + apiVersion + "/chatbot/generate-image").authenticated()
 														   
-							                               .anyRequest().authenticated ()
+														   // _______ Any other incoming http request must be authenticated __________
+							                               .anyRequest ().authenticated ()
 					)
 					.exceptionHandling(exception -> exception
 							                                .accessDeniedHandler(accessDeniedHandler())
