@@ -25,25 +25,6 @@ public class EmailTemplateConfig {
 			@Value("${app.frontend-url}")
 			private String frontendUrl;
 			
-			public void sendInvitationEmail(String toEmail, String inviteUrl) throws Exception {
-				try {
-					MimeMessage message = mailSender.createMimeMessage();
-					MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
-					
-					helper.setFrom(fromEmail, fromName);
-					helper.setTo(toEmail);
-					helper.setSubject("You're invited to join NewLife Hospital Platform");
-					helper.setText(buildInvitationHtml(inviteUrl), true);
-					
-					mailSender.send(message);
-					log.info("Invitation email sent to {}", toEmail);
-					
-				} catch (Exception ex) {
-					log.error("Failed to send invitation email to {}: {}", toEmail, ex.getMessage());
-					throw new BadRequestException("Failed to send invitation to: " + toEmail, ex);
-				}
-			}
-			
 			public void sendMagicLinkEmail(String toEmail, String userName, String token) throws Exception {
 				try {
 					String magicLinkUrl = frontendUrl + "/auth/magic-link/verify?token=" + token;
@@ -62,27 +43,6 @@ public class EmailTemplateConfig {
 				} catch (Exception e) {
 					log.error("Failed to send magic link email to {}: {}", toEmail, e.getMessage());
 					throw new BadRequestException("Failed to send magic link email", e);
-				}
-			}
-			
-			public void sendSetPasswordEmail(String toEmail, String userName, String token) throws Exception {
-				try {
-					String setupUrl = frontendUrl + "/auth/create-password?token=" + token;
-					
-					MimeMessage message = mailSender.createMimeMessage();
-					MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
-					
-					helper.setFrom(fromEmail, fromName);
-					helper.setTo(toEmail);
-					helper.setSubject("🔐 Set Your Password – NewLife Hospital Platform");
-					helper.setText(buildSetPasswordEmailBody(userName, setupUrl), true);
-					
-					mailSender.send(message);
-					log.info("Set-password email sent to {}", toEmail);
-					
-				} catch (Exception e) {
-					log.error("Failed to send set-password email to {}: {}", toEmail, e.getMessage());
-					throw new BadRequestException("Failed to send set-password email", e);
 				}
 			}
 			
@@ -126,73 +86,6 @@ public class EmailTemplateConfig {
 					log.error("Failed to send account creation email to {}: {}", toEmail, e.getMessage());
 					throw new BadRequestException("Failed to send account creation email", e);
 				}
-			}
-			
-			private String buildInvitationHtml(String inviteUrl) {
-				return """
-			                <!DOCTYPE html>
-			                <html lang="en">
-			                <head>
-			                  <meta charset="UTF-8"/>
-			                  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-			                  <title>NewLife Hospital Platform – Invitation</title>
-			                </head>
-			                <body style="margin:0;padding:0;background:#f4f6f8;font-family:Arial,Helvetica,sans-serif;">
-			                  <table width="100%%" cellpadding="0" cellspacing="0" style="background:#f4f6f8;padding:40px 0;">
-			                    <tr>
-			                      <td align="center">
-			                        <table width="560" cellpadding="0" cellspacing="0"
-			                               style="background:#ffffff;border-radius:10px;
-			                                      box-shadow:0 2px 8px rgba(0,0,0,.08);overflow:hidden;">
-			                          <tr>
-			                            <td align="center" style="background:#0d6e4f;padding:32px 40px;">
-			                              <h1 style="margin:0;color:#ffffff;font-size:24px;letter-spacing:.5px;">
-			                                🏥 NewLife Hospital Platform
-			                              </h1>
-			                              <p style="margin:6px 0 0;color:#a7f3d0;font-size:13px;">
-			                                Healthcare Management System
-			                              </p>
-			                            </td>
-			                          </tr>
-			                          <tr>
-			                            <td style="padding:40px;">
-			                              <h2 style="margin:0 0 12px;color:#1f2937;font-size:20px;">You've been invited!</h2>
-			                              <p style="margin:0 0 24px;color:#4b5563;font-size:15px;line-height:1.6;">
-			                                You have been invited to join <strong>NewLife Hospital Platform</strong>.
-			                                Click the button below to set up your account and get started.
-			                              </p>
-			                              <table cellpadding="0" cellspacing="0">
-			                                <tr>
-			                                  <td align="center" style="background:#0d6e4f;border-radius:6px;">
-			                                    <a href="%s"
-			                                       style="display:inline-block;padding:14px 32px;color:#ffffff;
-			                                              font-size:15px;font-weight:600;text-decoration:none;">
-			                                      Accept Invitation
-			                                    </a>
-			                                  </td>
-			                                </tr>
-			                              </table>
-			                              <p style="margin:24px 0 0;color:#9ca3af;font-size:13px;">
-			                                This link expires in <strong>15 minutes</strong>. If you were not expecting
-			                                this email, you can safely ignore it.
-			                              </p>
-			                            </td>
-			                          </tr>
-			                          <tr>
-			                            <td align="center"
-			                                style="background:#f9fafb;padding:20px 40px;border-top:1px solid #e5e7eb;">
-			                              <p style="margin:0;color:#9ca3af;font-size:12px;">
-			                                © 2026 NewLife Hospital Platform · All rights reserved
-			                              </p>
-			                            </td>
-			                          </tr>
-			                        </table>
-			                      </td>
-			                    </tr>
-			                  </table>
-			                </body>
-			                </html>
-			                """.formatted(inviteUrl);
 			}
 			
 			private String buildAccountCreatedEmailBody(String userName, String setupUrl) {
@@ -320,102 +213,6 @@ public class EmailTemplateConfig {
 			                            </td>
 			                          </tr>
 			
-			                        </table>
-			                      </td>
-			                    </tr>
-			                  </table>
-			                </body>
-			                </html>
-			                """.formatted(userName, setupUrl, setupUrl, setupUrl);
-			}
-			
-			private String buildSetPasswordEmailBody(String userName, String setupUrl) {
-				return """
-			                <!DOCTYPE html>
-			                <html lang="en">
-			                <head>
-			                  <meta charset="UTF-8"/>
-			                  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-			                  <title>Set Your Password – NewLife Hospital Platform</title>
-			                </head>
-			                <body style="margin:0;padding:0;background:#f0f4f8;
-			                             font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;">
-			                  <table width="100%%" cellpadding="0" cellspacing="0" style="background:#f0f4f8;padding:48px 20px;">
-			                    <tr>
-			                      <td align="center">
-			                        <table width="620" cellpadding="0" cellspacing="0"
-			                               style="background:#ffffff;border-radius:20px;
-			                                      box-shadow:0 12px 40px rgba(0,0,0,0.10);overflow:hidden;">
-			                          <tr>
-			                            <td align="center"
-			                                style="background:linear-gradient(135deg,#0d6e4f 0%%,#065f46 100%%);padding:44px 40px;">
-			                              <p style="margin:0;font-size:26px;font-weight:900;color:#ffffff;">
-			                                🏥 NewLife Hospital Platform
-			                              </p>
-			                              <p style="margin:8px 0 0;font-size:13px;color:#a7f3d0;">Secure Account Setup</p>
-			                              <p style="margin:16px 0 0;font-size:48px;">🔐</p>
-			                            </td>
-			                          </tr>
-			                          <tr>
-			                            <td style="padding:44px 40px;">
-			                              <p style="margin:0 0 14px;font-size:22px;font-weight:700;color:#0d1b2a;">
-			                                Hello, %s 👋
-			                              </p>
-			                              <p style="margin:0 0 32px;font-size:15px;color:#555;line-height:1.75;">
-			                                Your account setup on <strong>NewLife Hospital Platform</strong> is almost complete.
-			                                Click below to set your password. This link is valid for
-			                                <strong>15 minutes</strong> and can only be used once.
-			                              </p>
-			                              <table cellpadding="0" cellspacing="0" style="margin:0 auto 32px;">
-			                                <tr>
-			                                  <td align="center"
-			                                      style="background:linear-gradient(135deg,#0d6e4f 0%%,#065f46 100%%);
-			                                             border-radius:50px;box-shadow:0 6px 20px rgba(13,110,79,0.38);">
-			                                    <a href="%s"
-			                                       style="display:inline-block;padding:16px 48px;color:#ffffff;
-			                                              font-size:16px;font-weight:700;text-decoration:none;border-radius:50px;">
-			                                      Set My Password
-			                                    </a>
-			                                  </td>
-			                                </tr>
-			                              </table>
-			                              <table width="100%%" cellpadding="0" cellspacing="0"
-			                                     style="background:#f8f9fa;border:1px solid #e0e0e0;
-			                                            border-radius:10px;margin-bottom:28px;">
-			                                <tr>
-			                                  <td style="padding:16px 20px;">
-			                                    <p style="margin:0 0 8px;font-size:11px;font-weight:700;
-			                                              color:#9e9e9e;text-transform:uppercase;letter-spacing:1.5px;">
-			                                      Button not working? Copy and paste this link:
-			                                    </p>
-			                                    <a href="%s"
-			                                       style="font-size:12px;color:#0d6e4f;text-decoration:none;word-break:break-all;">
-			                                      %s
-			                                    </a>
-			                                  </td>
-			                                </tr>
-			                              </table>
-			                              <table width="100%%" cellpadding="0" cellspacing="0"
-			                                     style="background:#fff8e1;border-left:4px solid #f59e0b;border-radius:8px;">
-			                                <tr>
-			                                  <td style="padding:16px 20px;font-size:13px;color:#6d4c41;line-height:1.7;">
-			                                    ⚠️ <strong>Security Notice:</strong> This link is unique to your account.
-			                                    Do not share it with anyone. If you did not expect this email,
-			                                    contact your administrator immediately.
-			                                  </td>
-			                                </tr>
-			                              </table>
-			                            </td>
-			                          </tr>
-			                          <tr>
-			                            <td align="center"
-			                                style="background:#f8f9fa;padding:26px 40px;border-top:1px solid #eeeeee;">
-			                              <p style="margin:0;font-size:12px;color:#9e9e9e;">
-			                                © 2026 <strong style="color:#0d6e4f;">NewLife Hospital Platform</strong>
-			                                · All rights reserved
-			                              </p>
-			                            </td>
-			                          </tr>
 			                        </table>
 			                      </td>
 			                    </tr>
